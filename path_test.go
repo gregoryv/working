@@ -44,6 +44,15 @@ func TestNewPath(t *testing.T) {
 	}
 }
 
+func TestPath_String(t *testing.T) {
+	p := NewPath()
+	got := p.String()
+	exp := "."
+	if exp != got {
+		t.Errorf("Expected %q, got %q", exp, got)
+	}
+}
+
 type NopWriter struct{}
 
 func (nw *NopWriter) Write(p []byte) (n int, err error) {
