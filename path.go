@@ -12,7 +12,7 @@ type Path struct {
 	w    io.Writer
 }
 
-func NewDir() *Path {
+func NewPath() *Path {
 	return &Path{".", os.Stdout}
 }
 

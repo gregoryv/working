@@ -8,7 +8,7 @@ import (
 	. "github.com/gregoryv/qual"
 )
 
-func TestDir_List(t *testing.T) {
+func TestPath_List(t *testing.T) {
 	If := Wrap(t)
 
 	// setup temporary structure
@@ -31,8 +31,8 @@ func TestDir_List(t *testing.T) {
 	If(exp != got).Errorf("Expected \n%s, got \n%s", exp, got)
 }
 
-func TestNewDir(t *testing.T) {
-	got := NewDir()
+func TestNewPath(t *testing.T) {
+	got := NewPath()
 	if got == nil {
 		t.Fail()
 	}
