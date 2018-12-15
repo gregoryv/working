@@ -14,6 +14,7 @@ type Path struct {
 	w      io.Writer
 	Skip   func(string, os.FileInfo) bool
 	Format func(string, os.FileInfo) string
+	Filter func(string) string // Filters final output
 }
 
 func Hidden(path string, f os.FileInfo) bool {
@@ -23,10 +24,12 @@ func Hidden(path string, f os.FileInfo) bool {
 	return false
 }
 
+func unfiltered(path string) string              { return path }
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
 func NewPath() *Path {
-	return &Path{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly}
+	return &Path{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly,
+		Filter: unfiltered}
 }
 
 func (p *Path) String() string {
@@ -40,7 +43,10 @@ func (p *Path) Ls() {
 		close(out)
 	}()
 	for path := range out {
-		fmt.Fprintf(p.w, "%s\n", path)
+		line := p.Filter(path)
+		if line != "" {
+			fmt.Fprintf(p.w, "%s\n", line)
+		}
 	}
 }
 
@@ -49,8 +55,11 @@ func (p *Path) visitor(out chan string) filepath.WalkFunc {
 		if err != nil {
 			return err
 		}
-		// Skip hidden
+
 		if p.Skip(path, f) {
+			if f.IsDir() && path != "." {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if f.Name() != filepath.Base(p.Root) {
