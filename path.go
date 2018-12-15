@@ -25,7 +25,7 @@ func (p *Path) String() string {
 func (p *Path) Ls() {
 	out := make(chan string)
 	go func() {
-		_ = filepath.Walk(p.root, visitor(out))
+		_ = filepath.Walk(p.root, p.visitor(out))
 		close(out)
 	}()
 	for path := range out {
@@ -33,19 +33,18 @@ func (p *Path) Ls() {
 	}
 }
 
-func visitor(out chan string) filepath.WalkFunc {
+func (p *Path) visitor(out chan string) filepath.WalkFunc {
 	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
-		}
-		if f.IsDir() {
-			return nil
 		}
 		// Skip hidden
 		if strings.Index(f.Name(), ".") == 0 {
 			return nil
 		}
-		out <- f.Name()
+		if f.Name() != filepath.Base(p.root) {
+			out <- f.Name()
+		}
 		return nil
 	}
 }
