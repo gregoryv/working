@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type Path struct {
@@ -40,9 +41,25 @@ func visitor(out chan string) filepath.WalkFunc {
 		if f.IsDir() {
 			return nil
 		}
-		out <- path
+		// Skip hidden
+		if strings.Index(f.Name(), ".") == 0 {
+			return nil
+		}
+		out <- f.Name()
 		return nil
 	}
+}
+
+func (p *Path) TouchAll(filenames ...string) ([]string, error) {
+	files := make([]string, len(filenames))
+	for i, name := range filenames {
+		name, err := p.Touch(name)
+		if err != nil {
+			return files, err
+		}
+		files[i] = name
+	}
+	return files, nil
 }
 
 func (p *Path) Touch(filename string) (string, error) {
