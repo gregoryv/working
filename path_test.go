@@ -8,13 +8,13 @@ import (
 	. "github.com/gregoryv/qual"
 )
 
-func TestPath_List(t *testing.T) {
+func TestPath_Ls(t *testing.T) {
 	If := Wrap(t)
 
 	// setup temporary structure
 	tmpPath, err := ioutil.TempDir("", "dirlist")
 	If(err != nil).Fatal(err)
-	tmp := dir(tmpPath)
+	tmp := &Path{root: tmpPath, w: &NopWriter{}}
 	defer tmp.RemoveAll()
 	// add files
 	fileA, err := tmp.Touch("A")
@@ -25,7 +25,7 @@ func TestPath_List(t *testing.T) {
 
 	out := bytes.NewBufferString("")
 	d := &Path{root: tmpPath, w: out}
-	d.List()
+	d.Ls()
 	got := out.String()
 	exp := tmp.Join(fileA+"\n") + tmp.Join(fileB+"\n")
 	If(exp != got).Errorf("Expected \n%s, got \n%s", exp, got)
@@ -36,4 +36,10 @@ func TestNewPath(t *testing.T) {
 	if got == nil {
 		t.Fail()
 	}
+}
+
+type NopWriter struct{}
+
+func (nw *NopWriter) Write(p []byte) (n int, err error) {
+	return
 }
