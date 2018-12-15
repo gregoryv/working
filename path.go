@@ -12,13 +12,21 @@ import (
 type Path struct {
 	Root   string
 	w      io.Writer
+	Skip   func(string, os.FileInfo) bool
 	Format func(string, os.FileInfo) string
+}
+
+func Hidden(path string, f os.FileInfo) bool {
+	if strings.Index(f.Name(), ".") == 0 {
+		return true
+	}
+	return false
 }
 
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
 func NewPath() *Path {
-	return &Path{Root: ".", w: os.Stdout, Format: nameOnly}
+	return &Path{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly}
 }
 
 func (p *Path) String() string {
@@ -42,7 +50,7 @@ func (p *Path) visitor(out chan string) filepath.WalkFunc {
 			return err
 		}
 		// Skip hidden
-		if strings.Index(f.Name(), ".") == 0 {
+		if p.Skip(path, f) {
 			return nil
 		}
 		if f.Name() != filepath.Base(p.Root) {
