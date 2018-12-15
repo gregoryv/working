@@ -30,7 +30,7 @@ func TestPath_Ls(t *testing.T) {
 	// end setup
 
 	out := bytes.NewBufferString("")
-	d := &Path{root: tmpPath, w: out}
+	d := &Path{root: tmpPath, w: out, form: nameOnly}
 	d.Ls()
 	got := out.String()
 	exp := strings.Join(files, "\n") + "\n"

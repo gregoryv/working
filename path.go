@@ -12,10 +12,13 @@ import (
 type Path struct {
 	root string
 	w    io.Writer
+	form func(string, os.FileInfo) string
 }
 
+func nameOnly(path string, f os.FileInfo) string { return f.Name() }
+
 func NewPath() *Path {
-	return &Path{".", os.Stdout}
+	return &Path{root: ".", w: os.Stdout, form: nameOnly}
 }
 
 func (p *Path) String() string {
@@ -43,7 +46,7 @@ func (p *Path) visitor(out chan string) filepath.WalkFunc {
 			return nil
 		}
 		if f.Name() != filepath.Base(p.root) {
-			out <- f.Name()
+			out <- p.form(path, f)
 		}
 		return nil
 	}
