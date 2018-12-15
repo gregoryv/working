@@ -20,7 +20,7 @@ func TestPath_Ls(t *testing.T) {
 	err = os.MkdirAll(filepath.Join(tmpPath, subDir), 0644)
 	If(err != nil).Fatal(err)
 
-	tmp := &Path{root: tmpPath, w: &NopWriter{}}
+	tmp := &Path{Root: tmpPath, w: &NopWriter{}}
 	defer tmp.RemoveAll()
 
 	files, err := tmp.TouchAll("A", "B")
@@ -30,7 +30,7 @@ func TestPath_Ls(t *testing.T) {
 	// end setup
 
 	out := bytes.NewBufferString("")
-	d := &Path{root: tmpPath, w: out, form: nameOnly}
+	d := &Path{Root: tmpPath, w: out, Format: nameOnly}
 	d.Ls()
 	got := out.String()
 	exp := strings.Join(files, "\n") + "\n"

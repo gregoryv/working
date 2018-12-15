@@ -10,25 +10,25 @@ import (
 )
 
 type Path struct {
-	root string
-	w    io.Writer
-	form func(string, os.FileInfo) string
+	Root   string
+	w      io.Writer
+	Format func(string, os.FileInfo) string
 }
 
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
 func NewPath() *Path {
-	return &Path{root: ".", w: os.Stdout, form: nameOnly}
+	return &Path{Root: ".", w: os.Stdout, Format: nameOnly}
 }
 
 func (p *Path) String() string {
-	return p.root
+	return p.Root
 }
 
 func (p *Path) Ls() {
 	out := make(chan string)
 	go func() {
-		_ = filepath.Walk(p.root, p.visitor(out))
+		_ = filepath.Walk(p.Root, p.visitor(out))
 		close(out)
 	}()
 	for path := range out {
@@ -45,8 +45,8 @@ func (p *Path) visitor(out chan string) filepath.WalkFunc {
 		if strings.Index(f.Name(), ".") == 0 {
 			return nil
 		}
-		if f.Name() != filepath.Base(p.root) {
-			out <- p.form(path, f)
+		if f.Name() != filepath.Base(p.Root) {
+			out <- p.Format(path, f)
 		}
 		return nil
 	}
@@ -65,7 +65,7 @@ func (p *Path) TouchAll(filenames ...string) ([]string, error) {
 }
 
 func (p *Path) Touch(filename string) (string, error) {
-	fh, err := os.Create(path.Join(p.root, filename))
+	fh, err := os.Create(path.Join(p.Root, filename))
 	if err != nil {
 		return filename, err
 	}
@@ -73,9 +73,9 @@ func (p *Path) Touch(filename string) (string, error) {
 }
 
 func (p *Path) Join(filename string) string {
-	return filepath.Join(p.root, filename)
+	return filepath.Join(p.Root, filename)
 }
 
 func (p *Path) RemoveAll() error {
-	return os.RemoveAll(p.root)
+	return os.RemoveAll(p.Root)
 }
