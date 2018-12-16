@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -45,6 +46,11 @@ func (p *Path) MkdirAll(subDirs ...string) error {
 		}
 	}
 	return nil
+}
+
+func (p *Path) Command(cmd string, args ...string) *exec.Cmd {
+	os.Chdir(p.Root)
+	return exec.Command(cmd, args...)
 }
 
 func (p *Path) String() string {
