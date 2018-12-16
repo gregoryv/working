@@ -1,1 +1,1 @@
-gitls - simple ls command but with git status appended
+workdir - package defines WorkDir type for easy file operations

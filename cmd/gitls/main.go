@@ -7,11 +7,11 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/gregoryv/dir"
+	"github.com/gregoryv/workdir"
 )
 
 func main() {
-	wd := dir.NewWorkDir()
+	wd := workdir.New()
 
 	status, err := exec.Command("git", "-C", wd.Root, "status", "-s").Output()
 	if err != nil {

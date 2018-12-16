@@ -1,4 +1,4 @@
-package dir
+package workdir
 
 import (
 	"bytes"
@@ -40,15 +40,15 @@ func TestPath_Ls(t *testing.T) {
 	If(exp != got).Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)
 }
 
-func TestNewWorkDir(t *testing.T) {
-	got := NewWorkDir()
+func TestNew(t *testing.T) {
+	got := New()
 	if got == nil {
 		t.Fail()
 	}
 }
 
 func TestPath_String(t *testing.T) {
-	p := NewWorkDir()
+	p := New()
 	got := p.String()
 	exp := "."
 	if exp != got {

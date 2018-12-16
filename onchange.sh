@@ -14,4 +14,4 @@ case $extension in
 esac
 go test -coverprofile /tmp/c.out .
 uncover /tmp/c.out
-go install github.com/gregoryv/dir/cmd/gitls
+go install ./cmd/gitls

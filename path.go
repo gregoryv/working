@@ -1,4 +1,4 @@
-package dir
+package workdir
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ func Hidden(path string, f os.FileInfo) bool {
 func unfiltered(path string) string              { return path }
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
-func NewWorkDir() *WorkDir {
+func New() *WorkDir {
 	return &WorkDir{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly,
 		Filter: unfiltered}
 }
