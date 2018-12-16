@@ -11,13 +11,15 @@ func TestGitLs(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer tmp.RemoveAll()
-	out := bytes.NewBufferString("")
+	out := bytes.NewBufferString("\n")
 	tmp.Writer = out
 	tmp.GitLs()
-	exp := `   A
-    B
-    empty/
-    sub/C
+	exp := `
+ M A
+   B
+   empty/
+   sub/
+MM sub/C
 `
 	got := out.String()
 	if exp != got {
