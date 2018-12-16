@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type Path struct {
+type WorkDir struct {
 	Root   string
 	w      io.Writer
 	Skip   func(string, os.FileInfo) bool
@@ -29,16 +29,16 @@ func Hidden(path string, f os.FileInfo) bool {
 func unfiltered(path string) string              { return path }
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
-func NewPath() *Path {
-	return &Path{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly,
+func NewWorkDir() *WorkDir {
+	return &WorkDir{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly,
 		Filter: unfiltered}
 }
 
-func (p *Path) WriteFile(file string, data []byte) error {
+func (p *WorkDir) WriteFile(file string, data []byte) error {
 	return ioutil.WriteFile(p.Join(file), data, 0644)
 }
 
-func (p *Path) MkdirAll(subDirs ...string) error {
+func (p *WorkDir) MkdirAll(subDirs ...string) error {
 	for _, sub := range subDirs {
 		err := os.MkdirAll(filepath.Join(p.Root, sub), 0755)
 		if err != nil {
@@ -48,16 +48,16 @@ func (p *Path) MkdirAll(subDirs ...string) error {
 	return nil
 }
 
-func (p *Path) Command(cmd string, args ...string) *exec.Cmd {
+func (p *WorkDir) Command(cmd string, args ...string) *exec.Cmd {
 	os.Chdir(p.Root)
 	return exec.Command(cmd, args...)
 }
 
-func (p *Path) String() string {
+func (p *WorkDir) String() string {
 	return p.Root
 }
 
-func (p *Path) Ls() {
+func (p *WorkDir) Ls() {
 	out := make(chan string)
 	go func() {
 		_ = filepath.Walk(p.Root, p.visitor(out))
@@ -71,7 +71,7 @@ func (p *Path) Ls() {
 	}
 }
 
-func (p *Path) visitor(out chan string) filepath.WalkFunc {
+func (p *WorkDir) visitor(out chan string) filepath.WalkFunc {
 	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -90,7 +90,7 @@ func (p *Path) visitor(out chan string) filepath.WalkFunc {
 	}
 }
 
-func (p *Path) TouchAll(filenames ...string) ([]string, error) {
+func (p *WorkDir) TouchAll(filenames ...string) ([]string, error) {
 	files := make([]string, len(filenames))
 	for i, name := range filenames {
 		name, err := p.Touch(name)
@@ -102,7 +102,7 @@ func (p *Path) TouchAll(filenames ...string) ([]string, error) {
 	return files, nil
 }
 
-func (p *Path) Touch(filename string) (string, error) {
+func (p *WorkDir) Touch(filename string) (string, error) {
 	fh, err := os.Create(path.Join(p.Root, filename))
 	if err != nil {
 		return filename, err
@@ -110,10 +110,10 @@ func (p *Path) Touch(filename string) (string, error) {
 	return filename, fh.Close()
 }
 
-func (p *Path) Join(filename string) string {
+func (p *WorkDir) Join(filename string) string {
 	return filepath.Join(p.Root, filename)
 }
 
-func (p *Path) RemoveAll() error {
+func (p *WorkDir) RemoveAll() error {
 	return os.RemoveAll(p.Root)
 }

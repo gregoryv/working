@@ -13,12 +13,12 @@ import (
 // A         <--- Modified
 // B
 // .hidden
-func setup() (tmp *Path, err error) {
+func setup() (tmp *WorkDir, err error) {
 	tmpPath, err := ioutil.TempDir("", "gitstatus")
 	if err != nil {
 		return
 	}
-	tmp = &Path{Root: tmpPath, w: &NopWriter{}}
+	tmp = &WorkDir{Root: tmpPath, w: &NopWriter{}}
 	//defer tmp.RemoveAll()
 
 	tmp.MkdirAll("sub", "empty")

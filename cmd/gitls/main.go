@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	wd := dir.NewPath()
+	wd := dir.NewWorkDir()
 
 	status, err := exec.Command("git", "-C", wd.Root, "status", "-s").Output()
 	if err != nil {

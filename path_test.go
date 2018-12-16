@@ -20,7 +20,7 @@ func TestPath_Ls(t *testing.T) {
 	err = os.MkdirAll(filepath.Join(tmpPath, subDir), 0644)
 	If(err != nil).Fatal(err)
 
-	tmp := &Path{Root: tmpPath, w: &NopWriter{}}
+	tmp := &WorkDir{Root: tmpPath, w: &NopWriter{}}
 	defer tmp.RemoveAll()
 
 	files, err := tmp.TouchAll("A", "B")
@@ -30,7 +30,7 @@ func TestPath_Ls(t *testing.T) {
 	// end setup
 
 	out := bytes.NewBufferString("")
-	d := &Path{
+	d := &WorkDir{
 		Root: tmpPath, w: out, Skip: Hidden,
 		Format: nameOnly, Filter: unfiltered,
 	}
@@ -40,15 +40,15 @@ func TestPath_Ls(t *testing.T) {
 	If(exp != got).Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)
 }
 
-func TestNewPath(t *testing.T) {
-	got := NewPath()
+func TestNewWorkDir(t *testing.T) {
+	got := NewWorkDir()
 	if got == nil {
 		t.Fail()
 	}
 }
 
 func TestPath_String(t *testing.T) {
-	p := NewPath()
+	p := NewWorkDir()
 	got := p.String()
 	exp := "."
 	if exp != got {
