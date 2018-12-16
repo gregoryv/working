@@ -12,8 +12,7 @@ func TestGitLs(t *testing.T) {
 	}
 	defer tmp.RemoveAll()
 	out := bytes.NewBufferString("\n")
-	tmp.Writer = out
-	tmp.GitLs()
+	tmp.GitLs(out)
 	exp := `
  M A
    B

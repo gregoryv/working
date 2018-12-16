@@ -11,10 +11,9 @@ func TestPath_Ls(t *testing.T) {
 	tmp, _ := setup()
 	defer tmp.RemoveAll()
 
-	out := bytes.NewBufferString("")
-	tmp.Writer = out
-	tmp.Ls()
-	got := out.String()
+	w := bytes.NewBufferString("")
+	tmp.Ls(w)
+	got := w.String()
 	exp := `A
 B
 empty/

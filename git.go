@@ -1,6 +1,9 @@
 package workdir
 
-import "bytes"
+import (
+	"bytes"
+	"io"
+)
 
 type GitStatus []byte
 
@@ -20,6 +23,6 @@ func (wd *WorkDir) GitStatus() (GitStatus, error) {
 	return GitStatus(data), nil
 }
 
-func (wd *WorkDir) GitLs() {
-	wd.Ls()
+func (wd *WorkDir) GitLs(w io.Writer) {
+	wd.Ls(w)
 }
