@@ -18,12 +18,14 @@ func (nw *nopWriter) Write(p []byte) (n int, err error) {
 }
 
 type WorkDir struct {
-	Root   string
-	Writer io.Writer
-	Skip   func(*WorkDir, string, os.FileInfo) bool
-	Format func(*WorkDir, string, os.FileInfo) string
-	Filter func(string) string // Filters final output
+	Root        string
+	Writer      io.Writer
+	Skip        func(*WorkDir, string, os.FileInfo) bool
+	Format      func(*WorkDir, string, os.FileInfo) string
+	NewWalkFunc Visitor
 }
+
+type Filter func(string) string
 
 func Hidden(wd *WorkDir, path string, f os.FileInfo) bool {
 	if strings.Index(f.Name(), ".") == 0 {
@@ -44,11 +46,11 @@ func fullPath(wd *WorkDir, path string, f os.FileInfo) string {
 
 func New() *WorkDir {
 	return &WorkDir{
-		Root:   ".",
-		Writer: os.Stdout,
-		Skip:   Hidden,
-		Format: fullPath,
-		Filter: unfiltered,
+		Root:        ".",
+		Writer:      os.Stdout,
+		Skip:        Hidden,
+		Format:      fullPath,
+		NewWalkFunc: showVisible,
 	}
 }
 
@@ -88,20 +90,26 @@ func (wd *WorkDir) String() string {
 }
 
 func (wd *WorkDir) Ls() {
+	ls(wd, showVisible, unfiltered)
+}
+
+func ls(wd *WorkDir, visit Visitor, filter Filter) {
 	out := make(chan string)
 	go func() {
-		_ = filepath.Walk(wd.Root, wd.visitor(out))
+		_ = filepath.Walk(wd.Root, visit(wd, out))
 		close(out)
 	}()
 	for path := range out {
-		line := wd.Filter(path)
+		line := filter(path)
 		if line != "" {
 			fmt.Fprintf(wd.Writer, "%s\n", line)
 		}
 	}
 }
 
-func (wd *WorkDir) visitor(out chan string) filepath.WalkFunc {
+type Visitor func(wd *WorkDir, out chan string) filepath.WalkFunc
+
+func showVisible(wd *WorkDir, out chan string) filepath.WalkFunc {
 	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
