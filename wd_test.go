@@ -26,7 +26,7 @@ sub/C
 
 func TestNew(t *testing.T) {
 	got := New()
-	if got == nil {
+	if got != "." {
 		t.Fail()
 	}
 }

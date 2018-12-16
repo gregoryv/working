@@ -12,7 +12,7 @@ import (
 // A         <--- Modified
 // B
 // .hidden
-func setup() (tmp *WorkDir, err error) {
+func setup() (tmp WorkDir, err error) {
 	tmp, err = TempDir()
 	if err != nil {
 		return

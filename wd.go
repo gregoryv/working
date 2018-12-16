@@ -17,15 +17,13 @@ func (nw *nopWriter) Write(p []byte) (n int, err error) {
 	return
 }
 
-type WorkDir struct {
-	Root string
-}
+type WorkDir string
 
 func (wd *WorkDir) Ls(out io.Writer) {
 	if out == nil {
 		out = os.Stdout
 	}
-	filepath.Walk(wd.Root, showVisible(out, wd.Root))
+	filepath.Walk(wd.String(), showVisible(out, wd.String()))
 }
 
 func showVisible(w io.Writer, root string) filepath.WalkFunc {
@@ -50,30 +48,26 @@ func showVisible(w io.Writer, root string) filepath.WalkFunc {
 	}
 }
 
-func New() *WorkDir {
-	return &WorkDir{
-		Root: ".",
-	}
+func New() WorkDir {
+	return WorkDir(".")
 }
 
 // Returns a new temporary working directory.
-func TempDir() (wd *WorkDir, err error) {
+func TempDir() (WorkDir, error) {
 	tmpPath, err := ioutil.TempDir("", "workdir")
 	if err != nil {
-		return
+		return WorkDir(""), err
 	}
-	wd = New()
-	wd.Root = tmpPath
-	return
+	return WorkDir(tmpPath), nil
 }
 
-func (wd *WorkDir) WriteFile(file string, data []byte) error {
+func (wd WorkDir) WriteFile(file string, data []byte) error {
 	return ioutil.WriteFile(wd.Join(file), data, 0644)
 }
 
-func (wd *WorkDir) MkdirAll(subDirs ...string) error {
+func (wd WorkDir) MkdirAll(subDirs ...string) error {
 	for _, sub := range subDirs {
-		err := os.MkdirAll(filepath.Join(wd.Root, sub), 0755)
+		err := os.MkdirAll(filepath.Join(wd.String(), sub), 0755)
 		if err != nil {
 			return err
 		}
@@ -81,16 +75,16 @@ func (wd *WorkDir) MkdirAll(subDirs ...string) error {
 	return nil
 }
 
-func (wd *WorkDir) Command(cmd string, args ...string) *exec.Cmd {
-	os.Chdir(wd.Root)
+func (wd WorkDir) Command(cmd string, args ...string) *exec.Cmd {
+	os.Chdir(wd.String())
 	return exec.Command(cmd, args...)
 }
 
-func (wd *WorkDir) String() string {
-	return wd.Root
+func (wd WorkDir) String() string {
+	return string(wd)
 }
 
-func (wd *WorkDir) TouchAll(filenames ...string) ([]string, error) {
+func (wd WorkDir) TouchAll(filenames ...string) ([]string, error) {
 	files := make([]string, len(filenames))
 	for i, name := range filenames {
 		name, err := wd.Touch(name)
@@ -102,18 +96,18 @@ func (wd *WorkDir) TouchAll(filenames ...string) ([]string, error) {
 	return files, nil
 }
 
-func (wd *WorkDir) Touch(filename string) (string, error) {
-	fh, err := os.Create(path.Join(wd.Root, filename))
+func (wd WorkDir) Touch(filename string) (string, error) {
+	fh, err := os.Create(path.Join(wd.String(), filename))
 	if err != nil {
 		return filename, err
 	}
 	return filename, fh.Close()
 }
 
-func (wd *WorkDir) Join(filename string) string {
-	return filepath.Join(wd.Root, filename)
+func (wd WorkDir) Join(filename string) string {
+	return filepath.Join(wd.String(), filename)
 }
 
-func (wd *WorkDir) RemoveAll() error {
-	return os.RemoveAll(wd.Root)
+func (wd WorkDir) RemoveAll() error {
+	return os.RemoveAll(wd.String())
 }

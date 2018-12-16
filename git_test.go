@@ -27,8 +27,7 @@ MM sub/C
 }
 
 func TestGitStatus_err(t *testing.T) {
-	wd := New()
-	wd.Root = "/"
+	wd := WorkDir("/")
 	_, err := wd.GitStatus()
 	if err == nil {
 		t.Error("Expected error from GitStatus when checking non repo")
