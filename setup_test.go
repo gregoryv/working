@@ -12,36 +12,36 @@ import (
 // A         <--- Modified
 // B
 // .hidden
-func setup() (tmp WorkDir, err error) {
-	tmp, err = TempDir()
+func setup() (wd WorkDir, err error) {
+	wd, err = TempDir()
 	if err != nil {
 		return
 	}
-	tmp.MkdirAll("sub", "empty")
-	_, err = tmp.TouchAll("A", "B", "sub/C", ".hidden")
+	wd.MkdirAll("sub", "empty")
+	_, err = wd.TouchAll("A", "B", "sub/C", ".hidden")
 	if err != nil {
 		return
 	}
 
-	err = tmp.Command("git", "init", ".").Run()
+	err = wd.Command("git", "init", ".").Run()
 	if err != nil {
 		return
 	}
-	tmp.Command("git", "add", ".").Run()
-	tmp.Command("git", "commit", "-m", "Initial").Run()
-	tmp.WriteFile("A", []byte("hello"))
-	tmp.WriteFile("sub/C", []byte("hello"))
-	tmp.Command("git", "add", "sub/C").Run()
-	tmp.WriteFile("sub/C", []byte("world"))
+	wd.Command("git", "add", ".").Run()
+	wd.Command("git", "commit", "-m", "Initial").Run()
+	wd.WriteFile("A", []byte("hello"))
+	wd.WriteFile("sub/C", []byte("hello"))
+	wd.Command("git", "add", "sub/C").Run()
+	wd.WriteFile("sub/C", []byte("world"))
 	return
 }
 
 func Test_setup(t *testing.T) {
-	tmp, err := setup()
+	wd, err := setup()
 	if err != nil {
 		t.Error(err)
 	}
-	out, _ := tmp.Command("git", "status", "-z").Output()
+	out, _ := wd.Command("git", "status", "-z").Output()
 	got := string(out)
 	exp := " M A\x00MM sub/C\x00"
 	if exp != got {
