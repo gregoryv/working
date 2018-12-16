@@ -6,8 +6,10 @@ import (
 
 func TestGitStatus_Flags(t *testing.T) {
 	tmp, _ := setup()
-	data, _ := tmp.Command("git", "status", "-z").Output()
-	status := GitStatus(data)
+	status, err := tmp.GitStatus()
+	if err != nil {
+		t.Fatal(err)
+	}
 	cases := []struct {
 		path, exp string
 	}{

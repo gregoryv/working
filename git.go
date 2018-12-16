@@ -11,3 +11,11 @@ func (s GitStatus) Flags(path string) string {
 	}
 	return string(s[i-3 : i])
 }
+
+func (wd *WorkDir) GitStatus() (GitStatus, error) {
+	data, err := wd.Command("git", "status", "-z").Output()
+	if err != nil {
+		return GitStatus([]byte{}), err
+	}
+	return GitStatus(data), nil
+}
