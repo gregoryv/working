@@ -4,8 +4,18 @@ import (
 	"testing"
 )
 
+func TestGitStatus_err(t *testing.T) {
+	wd := New()
+	wd.Root = "/"
+	_, err := wd.GitStatus()
+	if err == nil {
+		t.Error("Expected error from GitStatus when checking non repo")
+	}
+}
+
 func TestGitStatus_Flags(t *testing.T) {
 	tmp, _ := setup()
+	defer tmp.RemoveAll()
 	status, err := tmp.GitStatus()
 	if err != nil {
 		t.Fatal(err)

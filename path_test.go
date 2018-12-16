@@ -2,41 +2,26 @@ package workdir
 
 import (
 	"bytes"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strings"
 	"testing"
 
 	. "github.com/gregoryv/qual"
 )
 
 func TestPath_Ls(t *testing.T) {
-	If := Wrap(t)
-
-	// setup temporary structure
-	tmpPath, err := ioutil.TempDir("", "dirlist")
-	subDir := "sub"
-	err = os.MkdirAll(filepath.Join(tmpPath, subDir), 0644)
-	If(err != nil).Fatal(err)
-
-	tmp := &WorkDir{Root: tmpPath, w: &NopWriter{}}
+	tmp, _ := setup()
 	defer tmp.RemoveAll()
 
-	files, err := tmp.TouchAll("A", "B")
-	If(err != nil).Fatal(err)
-	files = append(files, subDir)
-	tmp.Touch(".hidden")
-	// end setup
-
 	out := bytes.NewBufferString("")
-	d := &WorkDir{
-		Root: tmpPath, w: out, Skip: Hidden,
-		Format: nameOnly, Filter: unfiltered,
-	}
-	d.Ls()
+	tmp.Writer = out
+	tmp.Ls()
 	got := out.String()
-	exp := strings.Join(files, "\n") + "\n"
+	exp := `A
+B
+empty
+sub
+C
+`
+	If := Wrap(t)
 	If(exp != got).Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)
 }
 

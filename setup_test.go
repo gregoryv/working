@@ -1,7 +1,6 @@
 package workdir
 
 import (
-	"io/ioutil"
 	"testing"
 )
 
@@ -14,13 +13,10 @@ import (
 // B
 // .hidden
 func setup() (tmp *WorkDir, err error) {
-	tmpPath, err := ioutil.TempDir("", "gitstatus")
+	tmp, err = TempDir()
 	if err != nil {
 		return
 	}
-	tmp = &WorkDir{Root: tmpPath, w: &NopWriter{}}
-	//defer tmp.RemoveAll()
-
 	tmp.MkdirAll("sub", "empty")
 	_, err = tmp.TouchAll("A", "B", "sub/C", ".hidden")
 	if err != nil {

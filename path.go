@@ -13,7 +13,7 @@ import (
 
 type WorkDir struct {
 	Root   string
-	w      io.Writer
+	Writer io.Writer
 	Skip   func(string, os.FileInfo) bool
 	Format func(string, os.FileInfo) string
 	Filter func(string) string // Filters final output
@@ -30,8 +30,20 @@ func unfiltered(path string) string              { return path }
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
 func New() *WorkDir {
-	return &WorkDir{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly,
+	return &WorkDir{Root: ".", Writer: os.Stdout, Skip: Hidden, Format: nameOnly,
 		Filter: unfiltered}
+}
+
+// Returns a new temporary working directory.
+func TempDir() (wd *WorkDir, err error) {
+	tmpPath, err := ioutil.TempDir("", "workdir")
+	if err != nil {
+		return
+	}
+	wd = New()
+	wd.Root = tmpPath
+	wd.Writer = &NopWriter{}
+	return
 }
 
 func (p *WorkDir) WriteFile(file string, data []byte) error {
@@ -66,7 +78,7 @@ func (p *WorkDir) Ls() {
 	for path := range out {
 		line := p.Filter(path)
 		if line != "" {
-			fmt.Fprintf(p.w, "%s\n", line)
+			fmt.Fprintf(p.Writer, "%s\n", line)
 		}
 	}
 }
