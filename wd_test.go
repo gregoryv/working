@@ -17,9 +17,9 @@ func TestPath_Ls(t *testing.T) {
 	got := out.String()
 	exp := `A
 B
-empty
-sub
-C
+empty/
+sub/
+sub/C
 `
 	If := Wrap(t)
 	If(exp != got).Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)

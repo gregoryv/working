@@ -1,8 +1,29 @@
 package workdir
 
 import (
+	"bytes"
 	"testing"
 )
+
+func TestGitLs(t *testing.T) {
+	tmp, err := setup()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tmp.RemoveAll()
+	out := bytes.NewBufferString("")
+	tmp.Writer = out
+	tmp.GitLs()
+	exp := `   A
+    B
+    empty/
+    sub/C
+`
+	got := out.String()
+	if exp != got {
+		t.Errorf("Expected \n'%s'\ngot\n'%s'\n", exp, got)
+	}
+}
 
 func TestGitStatus_err(t *testing.T) {
 	wd := New()

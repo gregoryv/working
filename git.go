@@ -19,3 +19,7 @@ func (wd *WorkDir) GitStatus() (GitStatus, error) {
 	}
 	return GitStatus(data), nil
 }
+
+func (wd *WorkDir) GitLs() {
+	wd.Ls()
+}
