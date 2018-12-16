@@ -19,11 +19,11 @@ func (nw *nopWriter) Write(p []byte) (n int, err error) {
 
 type WorkDir string
 
-func (wd *WorkDir) Ls(out io.Writer) {
-	if out == nil {
-		out = os.Stdout
+func (wd WorkDir) Ls(w io.Writer) {
+	if w == nil {
+		w = os.Stdout
 	}
-	filepath.Walk(wd.String(), showVisible(out, wd.String()))
+	filepath.Walk(wd.String(), showVisible(w, string(wd)))
 }
 
 func showVisible(w io.Writer, root string) filepath.WalkFunc {

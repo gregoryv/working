@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-func TestGitLs(t *testing.T) {
+func TestLsGit(t *testing.T) {
 	tmp, err := setup()
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer tmp.RemoveAll()
 	out := bytes.NewBufferString("\n")
-	tmp.GitLs(out)
+	tmp.LsGit(out)
 	exp := `
  M A
    B

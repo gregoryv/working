@@ -8,11 +8,11 @@ import (
 )
 
 func TestPath_Ls(t *testing.T) {
-	tmp, _ := setup()
-	defer tmp.RemoveAll()
+	wd, _ := setup()
+	defer wd.RemoveAll()
 
 	w := bytes.NewBufferString("")
-	tmp.Ls(w)
+	wd.Ls(w)
 	got := w.String()
 	exp := `A
 B
