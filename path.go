@@ -3,6 +3,7 @@ package dir
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -30,6 +31,20 @@ func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 func NewPath() *Path {
 	return &Path{Root: ".", w: os.Stdout, Skip: Hidden, Format: nameOnly,
 		Filter: unfiltered}
+}
+
+func (p *Path) WriteFile(file string, data []byte) error {
+	return ioutil.WriteFile(p.Join(file), data, 0644)
+}
+
+func (p *Path) MkdirAll(subDirs ...string) error {
+	for _, sub := range subDirs {
+		err := os.MkdirAll(filepath.Join(p.Root, sub), 0755)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (p *Path) String() string {
