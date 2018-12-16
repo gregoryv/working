@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+type NopWriter struct{}
+
+func (nw *NopWriter) Write(p []byte) (n int, err error) {
+	return
+}
+
 type WorkDir struct {
 	Root   string
 	Writer io.Writer
@@ -30,8 +36,13 @@ func unfiltered(path string) string              { return path }
 func nameOnly(path string, f os.FileInfo) string { return f.Name() }
 
 func New() *WorkDir {
-	return &WorkDir{Root: ".", Writer: os.Stdout, Skip: Hidden, Format: nameOnly,
-		Filter: unfiltered}
+	return &WorkDir{
+		Root:   ".",
+		Writer: os.Stdout,
+		Skip:   Hidden,
+		Format: nameOnly,
+		Filter: unfiltered,
+	}
 }
 
 // Returns a new temporary working directory.

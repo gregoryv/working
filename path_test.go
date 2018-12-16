@@ -40,9 +40,3 @@ func TestPath_String(t *testing.T) {
 		t.Errorf("Expected %q, got %q", exp, got)
 	}
 }
-
-type NopWriter struct{}
-
-func (nw *NopWriter) Write(p []byte) (n int, err error) {
-	return
-}
