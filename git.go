@@ -36,17 +36,16 @@ func (wd WorkDir) GitStatus() (GitStatus, error) {
 	return GitStatus(data), nil
 }
 
-func (wd WorkDir) LsGit(w io.Writer, colorize bool) {
+func (wd WorkDir) LsGit(w io.Writer, colorize bool) error {
 	if w == nil {
 		w = os.Stdout
 	}
 	status, err := wd.GitStatus()
 	if err != nil || string(status) == "" {
-		wd.Ls(w)
-		return
+		return wd.Ls(w)
 	}
 	visit := showVisibleGit(w, string(wd), status, colorize)
-	filepath.Walk(string(wd), visit)
+	return filepath.Walk(string(wd), visit)
 }
 
 func showVisibleGit(w io.Writer, root string, status GitStatus, colorize bool) filepath.WalkFunc {

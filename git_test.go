@@ -5,6 +5,15 @@ import (
 	"testing"
 )
 
+func Test_LsGit_error(t *testing.T) {
+	wd, _ := TempDir()
+	wd.RemoveAll()
+	err := wd.LsGit(nil, false)
+	if err == nil {
+		t.Fail()
+	}
+}
+
 func TestLsGit_colored(t *testing.T) {
 	wd, _ := setup()
 	defer wd.RemoveAll()
