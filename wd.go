@@ -11,12 +11,6 @@ import (
 	"strings"
 )
 
-type nopWriter struct{}
-
-func (nw *nopWriter) Write(p []byte) (n int, err error) {
-	return
-}
-
 type WorkDir string
 
 func (wd WorkDir) Ls(w io.Writer) {
