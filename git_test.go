@@ -5,6 +5,16 @@ import (
 	"testing"
 )
 
+func TestLsGit_colored(t *testing.T) {
+	wd, _ := setup()
+	defer wd.RemoveAll()
+	out := bytes.NewBufferString("\n")
+	wd.LsGit(out, true)
+	if !bytes.Contains(out.Bytes(), []byte(RED)) {
+		t.Fail()
+	}
+}
+
 func TestLsGit(t *testing.T) {
 	tmp, err := setup()
 	if err != nil {
