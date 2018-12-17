@@ -7,11 +7,14 @@ import (
 
 // strange that disabling this makse showVisibleGit pass but enabling it does not
 func TestLsGit_nochanges(t *testing.T) {
-	wd, _ := setup()
+	wd, err := setup()
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer wd.RemoveAll()
 	wd.Command("git", "-a", ".").Run()
 	wd.Command("git", "commit", "-m", "hepp").Run()
-	err := wd.LsGit(nil, false)
+	err = wd.LsGit(nil, false)
 	if err != nil {
 		t.Error(err)
 	}
