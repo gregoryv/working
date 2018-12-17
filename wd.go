@@ -40,7 +40,8 @@ func showVisible(w io.Writer, root string) filepath.WalkFunc {
 		if f.Name() != filepath.Base(root) {
 			line := string(path[len(root)+1:])
 			if f.IsDir() {
-				line += "/"
+				fmt.Fprint(w, line, "/\n")
+				return filepath.SkipDir
 			}
 			fmt.Fprint(w, line, "\n")
 		}

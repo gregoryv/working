@@ -18,8 +18,6 @@ func TestPath_Ls(t *testing.T) {
 B
 empty/
 sub/
-sub/lev/
-sub/lev/C
 `
 	If := Wrap(t)
 	If(exp != got).Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)
