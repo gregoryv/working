@@ -28,7 +28,7 @@ func (wd WorkDir) GitStatus() (GitStatus, error) {
 	return GitStatus(data), nil
 }
 
-func (wd WorkDir) LsGit(w io.Writer) {
+func (wd WorkDir) LsGit(w io.Writer, colorize bool) {
 	if w == nil {
 		w = os.Stdout
 	}
@@ -37,11 +37,11 @@ func (wd WorkDir) LsGit(w io.Writer) {
 		wd.Ls(w)
 		return
 	}
-	visit := showVisibleGit(w, string(wd), status)
+	visit := showVisibleGit(w, string(wd), status, colorize)
 	filepath.Walk(string(wd), visit)
 }
 
-func showVisibleGit(w io.Writer, root string, status GitStatus) filepath.WalkFunc {
+func showVisibleGit(w io.Writer, root string, status GitStatus, colorize bool) filepath.WalkFunc {
 	lastDir := ""
 	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
@@ -59,6 +59,9 @@ func showVisibleGit(w io.Writer, root string, status GitStatus) filepath.WalkFun
 
 		line := string(path[len(root)+1:])
 		flags := status.Flags(line)
+		if colorize {
+			flags = color(flags)
+		}
 		if f.IsDir() {
 			line += "/"
 			if lastDir == "" {
@@ -75,4 +78,14 @@ func showVisibleGit(w io.Writer, root string, status GitStatus) filepath.WalkFun
 		fmt.Fprint(w, flags, line, "\n")
 		return nil
 	}
+}
+
+const (
+	NOCOLOR = "\033[0m"
+	RED     = "\033[0;31m"
+	GREEN   = "\033[0;32m"
+)
+
+func color(flags string) string {
+	return fmt.Sprintf("%s%s%s%s%s ", GREEN, string(flags[0]), RED, string(flags[1]), NOCOLOR)
 }

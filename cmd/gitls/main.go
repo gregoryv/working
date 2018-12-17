@@ -8,5 +8,5 @@ import (
 
 func main() {
 	wd := workdir.New()
-	wd.LsGit(os.Stdout)
+	wd.LsGit(os.Stdout, true)
 }

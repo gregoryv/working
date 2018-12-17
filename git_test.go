@@ -12,7 +12,7 @@ func TestLsGit(t *testing.T) {
 	}
 	defer tmp.RemoveAll()
 	out := bytes.NewBufferString("\n")
-	tmp.LsGit(out)
+	tmp.LsGit(out, false)
 	exp := `
  M A
    B
@@ -54,3 +54,5 @@ func TestGitStatus_Flags(t *testing.T) {
 		}
 	}
 }
+
+// hlh ljlk
