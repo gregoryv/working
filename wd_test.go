@@ -2,6 +2,7 @@ package workdir
 
 import (
 	"bytes"
+	"os"
 	"testing"
 
 	. "github.com/gregoryv/qual"
@@ -37,4 +38,17 @@ func TestPath_String(t *testing.T) {
 	if exp != got {
 		t.Errorf("Expected %q, got %q", exp, got)
 	}
+}
+
+func TestTouch(t *testing.T) {
+	wd, _ := TempDir()
+	wd.MkdirAll("x")
+	os.Chmod(wd.Join("x"), 0000)
+	_, err := wd.TouchAll("x")
+	if err == nil {
+		t.Error("Expected to fail")
+	}
+	// Cleanup
+	os.Chmod(wd.Join("x"), 0644)
+	wd.RemoveAll()
 }
