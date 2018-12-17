@@ -39,6 +39,15 @@ func Example() {
 	// sub/
 }
 
+func Test_Ls_error(t *testing.T) {
+	wd, _ := TempDir()
+	wd.RemoveAll()
+	err := wd.Ls(nil)
+	if err == nil {
+		t.Fail()
+	}
+}
+
 func Test_Ls(t *testing.T) {
 	wd, _ := setup()
 	defer wd.RemoveAll()

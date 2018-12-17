@@ -13,11 +13,11 @@ import (
 
 type WorkDir string
 
-func (wd WorkDir) Ls(w io.Writer) {
+func (wd WorkDir) Ls(w io.Writer) error {
 	if w == nil {
 		w = os.Stdout
 	}
-	filepath.Walk(wd.String(), showVisible(w, string(wd)))
+	return filepath.Walk(wd.String(), showVisible(w, string(wd)))
 }
 
 func showVisible(w io.Writer, root string) filepath.WalkFunc {
