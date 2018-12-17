@@ -49,7 +49,11 @@ func showVisible(w io.Writer, root string) filepath.WalkFunc {
 }
 
 func New() WorkDir {
-	return WorkDir(".")
+	path, err := os.Getwd()
+	if err != nil {
+		return WorkDir(".")
+	}
+	return WorkDir(path)
 }
 
 // Returns a new temporary working directory.

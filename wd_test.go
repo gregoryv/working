@@ -32,8 +32,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestPath_String(t *testing.T) {
-	p := New()
-	got := p.String()
+	got := New().String()
 	exp := "."
 	if exp != got {
 		t.Errorf("Expected %q, got %q", exp, got)
