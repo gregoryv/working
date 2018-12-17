@@ -18,7 +18,8 @@ func TestLsGit(t *testing.T) {
    B
    empty/
    sub/
-MM sub/C
+   sub/lev/
+MM sub/lev/C
 `
 	got := out.String()
 	if exp != got {
@@ -45,7 +46,7 @@ func TestGitStatus_Flags(t *testing.T) {
 		path, exp string
 	}{
 		{"A", " M "},
-		{"sub/C", "MM "},
+		{"sub/lev/C", "MM "},
 		{".hidden", ""},
 	}
 	for _, c := range cases {

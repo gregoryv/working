@@ -17,8 +17,8 @@ func setup() (wd WorkDir, err error) {
 	if err != nil {
 		return
 	}
-	wd.MkdirAll("sub", "empty")
-	_, err = wd.TouchAll("A", "B", "sub/C", ".hidden")
+	wd.MkdirAll("sub/lev", "empty")
+	_, err = wd.TouchAll("A", "B", "sub/lev/C", ".hidden")
 	if err != nil {
 		return
 	}
@@ -30,9 +30,9 @@ func setup() (wd WorkDir, err error) {
 	wd.Command("git", "add", ".").Run()
 	wd.Command("git", "commit", "-m", "Initial").Run()
 	wd.WriteFile("A", []byte("hello"))
-	wd.WriteFile("sub/C", []byte("hello"))
-	wd.Command("git", "add", "sub/C").Run()
-	wd.WriteFile("sub/C", []byte("world"))
+	wd.WriteFile("sub/lev/C", []byte("hello"))
+	wd.Command("git", "add", "sub/lev/C").Run()
+	wd.WriteFile("sub/lev/C", []byte("world"))
 	return
 }
 
@@ -43,7 +43,7 @@ func Test_setup(t *testing.T) {
 	}
 	out, _ := wd.Command("git", "status", "-z").Output()
 	got := string(out)
-	exp := " M A\x00MM sub/C\x00"
+	exp := " M A\x00MM sub/lev/C\x00"
 	if exp != got {
 		t.Errorf("Expected \n%q\ngot\n%q\n", exp, got)
 	}
