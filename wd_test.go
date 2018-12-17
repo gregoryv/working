@@ -8,6 +8,15 @@ import (
 	. "github.com/gregoryv/qual"
 )
 
+func TestTempDir_error(t *testing.T) {
+	os.Setenv("TMPDIR", "/_no_such_dir")
+	defer os.Setenv("TMPDIR", "/tmp")
+	_, err := TempDir()
+	if err == nil {
+		t.Fail()
+	}
+}
+
 func TestPath_Ls(t *testing.T) {
 	wd, _ := setup()
 	defer wd.RemoveAll()
