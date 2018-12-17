@@ -52,3 +52,14 @@ func TestTouch(t *testing.T) {
 	os.Chmod(wd.Join("x"), 0644)
 	wd.RemoveAll()
 }
+
+func TestMkdirAll(t *testing.T) {
+	wd, _ := TempDir()
+	os.Chmod(string(wd), 0000)
+	err := wd.MkdirAll("hepp")
+	if err == nil {
+		t.Error("Expected to fail")
+	}
+	os.Chmod(wd.Join("x"), 0644)
+	wd.RemoveAll()
+}
