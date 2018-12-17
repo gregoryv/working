@@ -15,7 +15,7 @@ type GitStatus []byte
 func (s GitStatus) Flags(path string) string {
 	i := bytes.Index(s, append([]byte(path), 0x00))
 	if i == -1 {
-		return ""
+		return "   "
 	}
 	return string(s[i-3 : i])
 }
@@ -42,6 +42,7 @@ func (wd WorkDir) LsGit(w io.Writer) {
 }
 
 func showVisibleGit(w io.Writer, root string, status GitStatus) filepath.WalkFunc {
+	lastDir := ""
 	return func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -55,19 +56,23 @@ func showVisibleGit(w io.Writer, root string, status GitStatus) filepath.WalkFun
 		if f.Name() == filepath.Base(root) {
 			return nil
 		}
+
 		line := string(path[len(root)+1:])
+		flags := status.Flags(line)
 		if f.IsDir() {
 			line += "/"
-		}
-		flags := ""
-		if !f.IsDir() {
-			flags = status.Flags(line)
-		}
-		if flags == "" {
-			flags = "   "
+			if lastDir == "" {
+				lastDir = line
+				return nil
+			}
+			if strings.Index(line, lastDir) == 0 && flags == "   " {
+				return nil
+			}
+			fmt.Fprint(w, flags, lastDir, "\n")
+			lastDir = ""
+			return nil
 		}
 		fmt.Fprint(w, flags, line, "\n")
-
 		return nil
 	}
 }

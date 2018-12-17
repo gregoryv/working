@@ -17,8 +17,6 @@ func TestLsGit(t *testing.T) {
  M A
    B
    empty/
-   sub/
-   sub/lev/
 MM sub/lev/C
 `
 	got := out.String()
@@ -47,7 +45,7 @@ func TestGitStatus_Flags(t *testing.T) {
 	}{
 		{"A", " M "},
 		{"sub/lev/C", "MM "},
-		{".hidden", ""},
+		{".hidden", "   "},
 	}
 	for _, c := range cases {
 		got := status.Flags(c.path)
