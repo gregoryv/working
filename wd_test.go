@@ -35,14 +35,14 @@ sub/
 }
 
 func TestNew(t *testing.T) {
-	got := New()
+	got := New(".")
 	if got != "." {
 		t.Fail()
 	}
 }
 
 func TestPath_String(t *testing.T) {
-	got := New().String()
+	got := WorkDir(".").String()
 	exp := "."
 	if exp != got {
 		t.Errorf("Expected %q, got %q", exp, got)
