@@ -13,8 +13,17 @@ type GitStatus []byte
 
 // Flags returns the status letters of a given path if any exist
 func (s GitStatus) Flags(path string) string {
+
 	i := bytes.Index(s, append([]byte(path), 0x00))
 	if i == -1 {
+		for _, part := range bytes.Split(s, []byte{0x00}) {
+			if len(part) == 0 {
+				continue
+			}
+			if part[0] == '?' && bytes.Index([]byte(path), part[3:]) == 0 {
+				return "?? "
+			}
+		}
 		return "   "
 	}
 	return string(s[i-3 : i])
@@ -87,5 +96,8 @@ const (
 )
 
 func color(flags string) string {
-	return fmt.Sprintf("%s%s%s%s%s ", GREEN, string(flags[0]), RED, string(flags[1]), NOCOLOR)
+	if flags[0] != '?' {
+		return fmt.Sprintf("%s%s%s%s%s ", GREEN, string(flags[0]), RED, string(flags[1]), NOCOLOR)
+	}
+	return fmt.Sprintf("%s%s%s", RED, flags, NOCOLOR)
 }

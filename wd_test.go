@@ -17,6 +17,7 @@ func TestPath_Ls(t *testing.T) {
 	exp := `A
 B
 empty/
+ex/
 sub/
 `
 	If := Wrap(t)

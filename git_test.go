@@ -17,6 +17,8 @@ func TestLsGit(t *testing.T) {
  M A
    B
    empty/
+?? ex/e1
+?? ex/e2
 MM sub/lev/C
 `
 	got := out.String()
