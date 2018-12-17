@@ -5,10 +5,25 @@ import (
 	"testing"
 )
 
-func Test_LsGit_error(t *testing.T) {
-	wd, _ := TempDir()
-	wd.RemoveAll()
+// strange that disabling this makse showVisibleGit pass but enabling it does not
+func TestLsGit_nochanges(t *testing.T) {
+	wd, _ := setup()
+	defer wd.RemoveAll()
+	wd.Command("git", "-a", ".").Run()
+	wd.Command("git", "commit", "-m", "hepp").Run()
 	err := wd.LsGit(nil, false)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestLsGit_error(t *testing.T) {
+	wd, err := TempDir()
+	if err != nil {
+		t.Fatal(err)
+	}
+	wd.RemoveAll()
+	err = wd.LsGit(nil, false)
 	if err == nil {
 		t.Fail()
 	}
@@ -25,13 +40,13 @@ func TestLsGit_colored(t *testing.T) {
 }
 
 func TestLsGit(t *testing.T) {
-	tmp, err := setup()
+	wd, err := setup()
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer tmp.RemoveAll()
+	defer wd.RemoveAll()
 	out := bytes.NewBufferString("\n")
-	tmp.LsGit(out, false)
+	wd.LsGit(out, false)
 	exp := `
  M A
    B
@@ -75,5 +90,3 @@ func TestGitStatus_Flags(t *testing.T) {
 		}
 	}
 }
-
-// hlh ljlk

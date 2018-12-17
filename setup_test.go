@@ -42,6 +42,7 @@ func Test_setup(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer wd.RemoveAll()
 	out, _ := wd.Command("git", "status", "-z").Output()
 	got := string(out)
 	exp := " M A\x00MM sub/lev/C\x00?? ex/\x00"

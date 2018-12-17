@@ -28,8 +28,9 @@ func TestTempDir_error(t *testing.T) {
 	}
 }
 
-func Example() {
+func ExampleWorkDir_Ls() {
 	wd, _ := setup()
+	defer wd.RemoveAll()
 	wd.Ls(nil)
 	// output:
 	// A
@@ -82,6 +83,7 @@ func Test_String(t *testing.T) {
 
 func TestTouch(t *testing.T) {
 	wd, _ := TempDir()
+	defer wd.RemoveAll()
 	wd.MkdirAll("x")
 	os.Chmod(wd.Join("x"), 0000)
 	_, err := wd.TouchAll("x")
@@ -90,16 +92,15 @@ func TestTouch(t *testing.T) {
 	}
 	// Cleanup
 	os.Chmod(wd.Join("x"), 0644)
-	wd.RemoveAll()
 }
 
 func TestMkdirAll(t *testing.T) {
 	wd, _ := TempDir()
+	defer wd.RemoveAll()
 	os.Chmod(string(wd), 0000)
 	err := wd.MkdirAll("hepp")
 	if err == nil {
 		t.Error("Expected to fail")
 	}
 	os.Chmod(wd.Join("x"), 0644)
-	wd.RemoveAll()
 }

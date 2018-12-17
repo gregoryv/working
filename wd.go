@@ -104,5 +104,8 @@ func (wd WorkDir) Join(filename string) string {
 }
 
 func (wd WorkDir) RemoveAll() error {
+	if string(wd) == "/" {
+		return fmt.Errorf("Cannot remove root directory")
+	}
 	return os.RemoveAll(wd.String())
 }
