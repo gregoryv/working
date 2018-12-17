@@ -3,10 +3,21 @@ package workdir
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/gregoryv/qual"
 )
+
+func Test_color(t *testing.T) {
+	cases := []string{"?? ", "M  ", " M "}
+	for _, input := range cases {
+		got := color(input)
+		if !strings.Contains(got, "\x1b[0m") || len(got) <= len(input) {
+			t.Errorf("Failed to colorize %q, got %q", input, got)
+		}
+	}
+}
 
 func TestTempDir_error(t *testing.T) {
 	os.Setenv("TMPDIR", "/_no_such_dir")
