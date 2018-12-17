@@ -17,7 +17,18 @@ func TestTempDir_error(t *testing.T) {
 	}
 }
 
-func TestPath_Ls(t *testing.T) {
+func Example() {
+	wd, _ := setup()
+	wd.Ls(nil)
+	// output:
+	// A
+	// B
+	// empty/
+	// ex/
+	// sub/
+}
+
+func Test_Ls(t *testing.T) {
 	wd, _ := setup()
 	defer wd.RemoveAll()
 
@@ -41,7 +52,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestPath_String(t *testing.T) {
+func Test_String(t *testing.T) {
 	got := WorkDir(".").String()
 	exp := "."
 	if exp != got {
