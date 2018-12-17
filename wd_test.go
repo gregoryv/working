@@ -9,6 +9,13 @@ import (
 	. "github.com/gregoryv/qual"
 )
 
+func TestRemoveAll(t *testing.T) {
+	err := WorkDir("/").RemoveAll() // :-)
+	if err == nil {
+		t.Fatal("Well we've probably erased the entire disk")
+	}
+}
+
 func Test_color(t *testing.T) {
 	cases := []string{"?? ", "M  ", " M "}
 	for _, input := range cases {
