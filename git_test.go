@@ -31,7 +31,7 @@ func Test_lsGit_error(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	status, _ := wd.GitStatus()
+	status, _ := wd.Status()
 	err = wd.RemoveAll()
 	if err != nil {
 		t.Fatal(err)
@@ -89,9 +89,9 @@ MM sub/lev/C
 	}
 }
 
-func TestGitStatus_err(t *testing.T) {
+func TestStatus_err(t *testing.T) {
 	wd := WorkDir("/")
-	_, err := wd.GitStatus()
+	_, err := wd.Status()
 	if err == nil {
 		t.Error("Expected error from GitStatus when checking non repo")
 	}
@@ -100,7 +100,7 @@ func TestGitStatus_err(t *testing.T) {
 func TestGitStatus_Flags(t *testing.T) {
 	tmp, _ := setup()
 	defer tmp.RemoveAll()
-	status, err := tmp.GitStatus()
+	status, err := tmp.Status()
 	if err != nil {
 		t.Fatal(err)
 	}
