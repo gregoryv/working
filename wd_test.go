@@ -44,6 +44,7 @@ func ExampleWorkDir_Ls() {
 	// B
 	// empty/
 	// ex/
+	// newdir/
 	// sub/
 }
 
@@ -67,6 +68,7 @@ func Test_Ls(t *testing.T) {
 B
 empty/
 ex/
+newdir/
 sub/
 `
 	If := Wrap(t)

@@ -15,17 +15,13 @@ type GitStatus []byte
 func (s GitStatus) Flags(path string) string {
 	i := bytes.Index(s, append([]byte(path), 0x00))
 	if i == -1 {
-		for _, part := range bytes.Split(s, []byte{0x00}) {
-			if len(part) == 0 {
-				continue
-			}
-			if part[0] == '?' && bytes.Index([]byte(path), part[3:]) == 0 {
-				return "?? "
-			}
-		}
 		return "   "
 	}
 	return string(s[i-3 : i])
+}
+
+func (s GitStatus) IsNew(path string) bool {
+	return s.Flags(path) == "?? "
 }
 
 func (wd WorkDir) Status() (GitStatus, error) {
@@ -48,7 +44,7 @@ func (wd WorkDir) lsGit(w io.Writer, status GitStatus, colorize bool) error {
 	if w == nil {
 		w = os.Stdout
 	}
-	if string(bytes.TrimSpace(status)) == "" {
+	if string(status) == "" {
 		return wd.Ls(w)
 	}
 	visit := showVisibleGit(w, string(wd), status, colorize)
@@ -61,23 +57,40 @@ func showVisibleGit(w io.Writer, root string, status GitStatus, colorize bool) f
 		if err != nil {
 			return err
 		}
-		if strings.Index(f.Name(), ".") == 0 {
-			if f.IsDir() && path != "." {
-				return filepath.SkipDir
-			}
-			return nil
+		isHidden := f.Name()[0] == '.'
+		isRoot := f.Name() == filepath.Base(root)
+		if f.IsDir() && isHidden {
+			return filepath.SkipDir
 		}
-		if f.Name() == filepath.Base(root) {
+		if isHidden || isRoot {
 			return nil
 		}
 
 		line := string(path[len(root)+1:])
+		if f.IsDir() {
+			line += "/"
+		}
+		isNew := status.IsNew(line)
 		flags := status.Flags(line)
 		if colorize {
 			flags = color(flags)
 		}
+		if isNew && f.IsDir() {
+			fmt.Fprint(w, flags, line, "\n")
+			return filepath.SkipDir
+		}
+
+		if isNew {
+			fmt.Fprint(w, flags, line, "\n")
+			return nil
+		}
+
+		inSubDir := strings.Contains(line, "/")
+		noFlags := status.Flags(line) == "   "
+		if !f.IsDir() && inSubDir && noFlags {
+			return nil
+		}
 		if f.IsDir() {
-			line += "/"
 			if lastDir == "" {
 				lastDir = line
 				return nil

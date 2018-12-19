@@ -20,7 +20,8 @@ func TestLsGit_nochanges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = wd.LsGit(nil, false)
+	out := bytes.NewBufferString("")
+	err = wd.LsGit(out, false)
 	if err != nil {
 		t.Error(err)
 	}
@@ -81,12 +82,13 @@ func TestLsGit(t *testing.T) {
    empty/
 ?? ex/e1
 ?? ex/e2
+?? newdir/
 MM sub/lev/C
 `
 	got := out.String()
 	if exp != got {
 		t.Errorf("Expected \n'%s'\ngot\n'%s'\n", exp, got)
-	}
+	} //
 }
 
 func TestStatus_err(t *testing.T) {
