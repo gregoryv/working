@@ -12,11 +12,33 @@ func TestLsGit_nochanges(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer wd.RemoveAll()
-	wd.Command("git", "-a", ".").Run()
-	wd.Command("git", "commit", "-m", "hepp").Run()
+	err = wd.Command("git", "add", ".").Run()
+	if err != nil {
+		t.Fatal("git add failed ", err)
+	}
+	err = wd.Command("git", "commit", "-m", "hepp").Run()
+	if err != nil {
+		t.Fatal(err)
+	}
 	err = wd.LsGit(nil, false)
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func Test_lsGit_error(t *testing.T) {
+	wd, err := setup()
+	if err != nil {
+		t.Fatal(err)
+	}
+	status, _ := wd.GitStatus()
+	err = wd.RemoveAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = wd.lsGit(nil, status, false)
+	if err == nil {
+		t.Fatal(err)
 	}
 }
 
@@ -25,10 +47,13 @@ func TestLsGit_error(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wd.RemoveAll()
+	err = wd.RemoveAll()
+	if err != nil {
+		t.Fatal(err)
+	}
 	err = wd.LsGit(nil, false)
 	if err == nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 }
 

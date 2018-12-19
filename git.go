@@ -37,11 +37,18 @@ func (wd WorkDir) GitStatus() (GitStatus, error) {
 }
 
 func (wd WorkDir) LsGit(w io.Writer, colorize bool) error {
+	status, err := wd.GitStatus()
+	if err != nil {
+		return err
+	}
+	return wd.lsGit(w, status, colorize)
+}
+
+func (wd WorkDir) lsGit(w io.Writer, status GitStatus, colorize bool) error {
 	if w == nil {
 		w = os.Stdout
 	}
-	status, err := wd.GitStatus()
-	if err != nil || string(status) == "" {
+	if string(bytes.TrimSpace(status)) == "" {
 		return wd.Ls(w)
 	}
 	visit := showVisibleGit(w, string(wd), status, colorize)
