@@ -14,13 +14,13 @@ func setup() (wd WorkDir, err error) {
 	if err != nil {
 		return
 	}
-
 	err = wd.Command("git", "init", ".").Run()
 	if err != nil {
 		return
 	}
 	wd.Command("git", "add", ".").Run()
 	wd.Command("git", "commit", "-m", "Initial").Run()
+
 	wd.WriteFile("A", []byte("hello"))
 	wd.WriteFile("sub/lev/C", []byte("hello"))
 	wd.Command("git", "add", "sub/lev/C").Run()
