@@ -3,3 +3,24 @@
 
 
 [workdir](https://godoc.org/github.com/gregoryv/workdir) - Go package defines WorkDir type for easy file operations
+
+This package is most useful if you need to do multiple file operations
+within one directory. Eg. something like
+
+    cd /tmp/dir
+	mkdir child1 child2
+	touch child1/A child2/B
+	# do some stuff
+	cd
+	rm -rf /tmp/dir
+
+Simply cast a path to a WorkDir type
+
+    wd := workdir.New("/tmp/dir")
+	wd.MkdirAll("child1", "child2")
+	wd.TouchAll("child1/A", "child2/B")
+	// do stuff
+	wd.RemoveAll()
+
+
+There is also some code here for merging git output with plain ls result.
