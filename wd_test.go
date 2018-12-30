@@ -9,6 +9,23 @@ import (
 	. "github.com/gregoryv/qual"
 )
 
+func TestIsEmpty(t *testing.T) {
+	tmp, _ := TempDir()
+	if !tmp.IsEmpty("") {
+		t.Error("Expected new temporary directory to be empty")
+	}
+	tmp.TouchAll("k")
+	if tmp.IsEmpty("") {
+		t.Error("Dir with contents should not be empty")
+	}
+
+	tmp.RemoveAll()
+	if tmp.IsEmpty("") {
+		t.Error("IsEmpty should be false for non existing")
+	}
+
+}
+
 func TestRemoveAll(t *testing.T) {
 	err := WorkDir("/").RemoveAll() // :-)
 	if err == nil {
