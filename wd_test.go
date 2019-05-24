@@ -5,8 +5,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-
-	. "github.com/gregoryv/qual"
 )
 
 func TestIsEmpty(t *testing.T) {
@@ -88,8 +86,9 @@ ex/
 newdir/
 sub/
 `
-	If := Wrap(t)
-	If(exp != got).Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)
+	if exp != got {
+		t.Errorf("Expected \n'%s'\ngot \n'%s'", exp, got)
+	}
 }
 
 func TestNew(t *testing.T) {
