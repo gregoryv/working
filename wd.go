@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+func New(path string) WorkDir {
+	return WorkDir(path)
+}
+
 type WorkDir string
 
 // IsEmpty returns true if the dir is empty, false otherwise.
@@ -30,6 +34,7 @@ func (wd WorkDir) IsEmpty(dir string) bool {
 	return false
 }
 
+// List content using the given writer. If w is nil stdout is used.
 func (wd WorkDir) Ls(w io.Writer) error {
 	if w == nil {
 		w = os.Stdout
@@ -60,10 +65,6 @@ func showVisible(w io.Writer, root string) filepath.WalkFunc {
 	}
 }
 
-func New(path string) WorkDir {
-	return WorkDir(path)
-}
-
 // Returns a new temporary working directory.
 func TempDir() (WorkDir, error) {
 	tmpPath, err := ioutil.TempDir("", "workdir")
@@ -73,6 +74,7 @@ func TempDir() (WorkDir, error) {
 	return WorkDir(tmpPath), nil
 }
 
+// WriteFile creates/writes over the file with mode 0644
 func (wd WorkDir) WriteFile(file string, data []byte) error {
 	return ioutil.WriteFile(wd.Join(file), data, 0644)
 }
