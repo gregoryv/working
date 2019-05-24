@@ -129,3 +129,37 @@ func TestMkdirAll(t *testing.T) {
 	}
 	os.Chmod(wd.Join("x"), 0644)
 }
+
+func ExampleCopy() {
+	wd, _ := TempDir()
+	defer wd.RemoveAll()
+	wd.WriteFile("src", []byte("hello"))
+	wd.Copy("dest", "src")
+	wd.Ls(nil)
+	// output:
+	// dest
+	// src
+}
+
+func TestCopy_errors(t *testing.T) {
+	wd, _ := TempDir()
+	defer wd.RemoveAll()
+	err := wd.Copy("dest", "nosuchfile")
+	if err == nil {
+		t.Error("Should fail to copy when src doesn't exist")
+	}
+	a := "a.file"
+	b := "b.file"
+	body := []byte("content")
+	wd.WriteFile(a, body)
+	wd.WriteFile(b, body)
+	err = os.Chmod(wd.Join(a), 0000)
+	if err != nil {
+		t.Error(err)
+	}
+	err = wd.Copy(a, b)
+	if err == nil {
+		t.Error("Should fail if cannot write destination")
+	}
+	os.Chmod(wd.Join(a), 0644)
+}

@@ -128,3 +128,21 @@ func (wd WorkDir) RemoveAll() error {
 	}
 	return os.RemoveAll(wd.String())
 }
+
+// Copy the src file to dest. Both src and dest are considered to be
+// inside the working dir.
+func (wd WorkDir) Copy(dest, src string) (err error) {
+	in, err := os.Open(wd.Join(src))
+	if err != nil {
+		return
+	}
+	defer in.Close()
+
+	out, err := os.Create(wd.Join(dest))
+	if err != nil {
+		return
+	}
+	defer out.Close()
+	_, err = io.Copy(out, in)
+	return
+}
