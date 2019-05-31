@@ -79,6 +79,16 @@ func (wd WorkDir) WriteFile(file string, data []byte) error {
 	return ioutil.WriteFile(wd.Join(file), data, 0644)
 }
 
+// ReadAll loads the given file like ioutil.ReadAll
+func (wd WorkDir) Load(file string) ([]byte, error) {
+	fh, err := os.Open(wd.Join(file))
+	if err != nil {
+		return nil, err
+	}
+	defer fh.Close()
+	return ioutil.ReadAll(fh)
+}
+
 func (wd WorkDir) MkdirAll(subDirs ...string) error {
 	for _, sub := range subDirs {
 		err := os.MkdirAll(filepath.Join(wd.String(), sub), 0755)

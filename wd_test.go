@@ -5,7 +5,28 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/gregoryv/asserter"
 )
+
+func TestLoad(t *testing.T) {
+	wd, _ := TempDir()
+	_, err := wd.Load("nosuchfile")
+	if err == nil {
+		t.Error("should fail when loading nonexisting file")
+	}
+
+	exp := "hello"
+	wd.WriteFile("x", []byte(exp))
+	body, err := wd.Load("x")
+	if err != nil {
+		t.Error(err)
+	}
+	got := string(body)
+	assert := asserter.New(t)
+	assert().Equals(got, exp)
+	wd.RemoveAll()
+}
 
 func TestIsEmpty(t *testing.T) {
 	tmp, _ := TempDir()

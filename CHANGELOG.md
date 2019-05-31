@@ -7,5 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 
+- Load files
 - Copy files within WorkDir
 - lsgit command showing directory contents with augmented git status
