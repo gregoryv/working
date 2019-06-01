@@ -3,7 +3,6 @@ package workdir
 import (
 	"bytes"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/gregoryv/asserter"
@@ -49,16 +48,6 @@ func TestRemoveAll(t *testing.T) {
 	err := WorkDir("/").RemoveAll() // :-)
 	if err == nil {
 		t.Fatal("Well we've probably erased the entire disk")
-	}
-}
-
-func Test_color(t *testing.T) {
-	cases := []string{"?? ", "M  ", " M "}
-	for _, input := range cases {
-		got := color(input)
-		if !strings.Contains(got, "\x1b[0m") || len(got) <= len(input) {
-			t.Errorf("Failed to colorize %q, got %q", input, got)
-		}
 	}
 }
 

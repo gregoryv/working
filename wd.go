@@ -47,22 +47,37 @@ func showVisible(w io.Writer, root string) filepath.WalkFunc {
 		if err != nil {
 			return err
 		}
-		if strings.Index(f.Name(), ".") == 0 {
-			if f.IsDir() && path != "." {
-				return filepath.SkipDir
-			}
-			return nil
+
+		ok, err := isVisibleAndOk(root, path, f)
+		if !ok {
+			return err
 		}
-		if f.Name() != filepath.Base(root) {
-			line := string(path[len(root)+1:])
-			if f.IsDir() {
-				fmt.Fprint(w, line, "/\n")
-				return filepath.SkipDir
-			}
-			fmt.Fprint(w, line, "\n")
+
+		line := string(path[len(root)+1:])
+		if f.IsDir() {
+			fmt.Fprint(w, line, "/\n")
+			return filepath.SkipDir
 		}
+		fmt.Fprint(w, line, "\n")
 		return nil
 	}
+}
+
+func isVisibleAndOk(root, path string, f os.FileInfo) (ok bool, err error) {
+	if f.Name() == filepath.Base(root) {
+		return false, nil
+	}
+	if !visible(f) {
+		if f.IsDir() {
+			return false, filepath.SkipDir
+		}
+		return false, nil
+	}
+	return true, nil
+}
+
+func visible(f os.FileInfo) bool {
+	return strings.Index(f.Name(), ".") != 0
 }
 
 // Returns a new temporary working directory.
