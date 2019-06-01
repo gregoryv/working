@@ -60,19 +60,6 @@ func TestTempDir_error(t *testing.T) {
 	}
 }
 
-func ExampleWorkDir_Ls() {
-	wd, _ := setup()
-	defer wd.RemoveAll()
-	wd.Ls(nil)
-	// output:
-	// A
-	// B
-	// empty/
-	// ex/
-	// newdir/
-	// sub/
-}
-
 func Test_Ls_error(t *testing.T) {
 	wd, _ := TempDir()
 	wd.RemoveAll()
@@ -138,17 +125,6 @@ func TestMkdirAll(t *testing.T) {
 		t.Error("Expected to fail")
 	}
 	os.Chmod(wd.Join("x"), 0644)
-}
-
-func ExampleCopy() {
-	wd, _ := TempDir()
-	defer wd.RemoveAll()
-	wd.WriteFile("src", []byte("hello"))
-	wd.Copy("dest", "src")
-	wd.Ls(nil)
-	// output:
-	// dest
-	// src
 }
 
 func TestCopy_errors(t *testing.T) {
