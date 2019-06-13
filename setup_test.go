@@ -1,6 +1,7 @@
 package workdir
 
 import (
+	"os"
 	"testing"
 )
 
@@ -9,6 +10,7 @@ func setup() (wd WorkDir, err error) {
 	if err != nil {
 		return
 	}
+	os.Chdir(wd.String())
 	wd.MkdirAll("sub/lev", "empty", "ex", "newdir")
 	_, err = wd.TouchAll("A", "B", "sub/lev/C", ".hidden", "ex/D")
 	if err != nil {
@@ -18,6 +20,7 @@ func setup() (wd WorkDir, err error) {
 	if err != nil {
 		return
 	}
+
 	wd.Command("git", "add", ".").Run()
 	wd.Command("git", "commit", "-m", "Initial").Run()
 
