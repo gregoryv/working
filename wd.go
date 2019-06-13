@@ -115,7 +115,6 @@ func (wd WorkDir) MkdirAll(subDirs ...string) error {
 }
 
 func (wd WorkDir) Command(cmd string, args ...string) *exec.Cmd {
-	os.Chdir(wd.String())
 	return exec.Command(cmd, args...)
 }
 
