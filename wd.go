@@ -17,6 +17,10 @@ func New(path string) WorkDir {
 
 type WorkDir string
 
+func (wd WorkDir) Chmod(filename string, mode os.FileMode) error {
+	return os.Chmod(wd.Join(filename), mode)
+}
+
 // IsEmpty returns true if the dir is empty, false otherwise.
 // Use empty string to check the workdir itself.
 func (wd WorkDir) IsEmpty(dir string) bool {

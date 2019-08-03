@@ -8,6 +8,17 @@ import (
 	"github.com/gregoryv/asserter"
 )
 
+func TestChmod(t *testing.T) {
+	wd, _ := TempDir()
+	f := "file"
+	wd.Touch(f)
+	err := wd.Chmod(f, 0400) // read only
+	if err != nil {
+		t.Error(wd, err)
+	}
+	wd.RemoveAll()
+}
+
 func TestLoad(t *testing.T) {
 	wd, _ := TempDir()
 	_, err := wd.Load("nosuchfile")
