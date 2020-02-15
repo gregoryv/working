@@ -29,34 +29,34 @@ func (wd WorkDir) Watch(ctx context.Context, w *Sensor, fn ModifiedFunc) {
 
 type ModifiedFunc func(wd WorkDir, modified ...string)
 
-func NewSensor(recursive bool) *Sensor {
+func NewSensor() *Sensor {
 	return &Sensor{
-		Last:      time.Now(),
-		modified:  make([]string, 0),
-		recursive: recursive,
+		Last:     time.Now(),
+		modified: make([]string, 0),
+		ignore:   []string{"#", ".git/", "vendor/"},
 	}
 }
 
 type Sensor struct {
+	Recursive bool
 	Last      time.Time
 	modified  []string
-	recursive bool
+	ignore    []string
 }
 
 func (s *Sensor) scanForChanges(root string) {
 	filepath.Walk(root, s.visit)
 }
 
-var alwaysIgnore = []string{"#", ".git/", "vendor/"}
-
-func (w *Sensor) ignore(path string, f os.FileInfo) bool {
+// Ignore returns true if the file should be ignored
+func (w *Sensor) Ignore(path string, f os.FileInfo) bool {
 	if f == nil { // if directory has been removed
 		return true
 	}
 	if f.IsDir() {
 		return true
 	}
-	for _, thing := range alwaysIgnore {
+	for _, thing := range w.ignore {
 		if strings.Contains(path, thing) {
 			return true
 		}
@@ -65,13 +65,13 @@ func (w *Sensor) ignore(path string, f os.FileInfo) bool {
 }
 
 func (w *Sensor) visit(path string, f os.FileInfo, err error) error {
-	if w.ignore(path, f) {
+	if w.Ignore(path, f) {
 		return nil
 	}
 	if f.ModTime().After(w.Last) {
 		w.modified = append(w.modified, path)
 	}
-	if w.recursive {
+	if w.Recursive {
 		return nil
 	}
 	return filepath.SkipDir
