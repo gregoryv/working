@@ -39,7 +39,7 @@ type KMeansPoint struct {
 func NewKMeansPoint(items []float64) *KMeansPoint {
 	self := &KMeansPoint{}
 	self.items = lang.NewArrayList()
-	for i :=0; i < len(items); i++ {
+	for i := 0; i < len(items); i++ {
 		self.items.Add(items[i])
 	}
 	return self
@@ -50,16 +50,16 @@ func (self *KMeansPoint) Items() *lang.ArrayList {
 }
 
 func (self *KMeansPoint) DistanceFromPoint(otherPoint *KMeansPoint) float64 {
-	if (self.items.Len() != otherPoint.items.Len()) {
+	if self.items.Len() != otherPoint.items.Len() {
 		panic(fmt.Sprintf("itemA (%d) length doesn't match itemB (%d) length", self.items.Len(), otherPoint.items.Len()))
 	}
-	
-	total := 0.0 
+
+	total := 0.0
 	for i := 0; i < self.items.Len(); i++ {
 		thisCoordinate := self.items.Get(i).(float64)
 		otherCoordinate := otherPoint.items.Get(i).(float64)
 		total = total + math.Pow(thisCoordinate-otherCoordinate, 2)
 	}
-	
+
 	return math.Sqrt(total)
 }

@@ -54,7 +54,7 @@ func (self *KMeansCluster) Recenter() float64 {
 	totalPoint := self.points.Len()
 	firstPoint := self.points.Get(0).(*KMeansPoint)
 	totalCoordinates := firstPoint.items.Len()
-	
+
 	// sum up the points
 	totals := make([]float64, totalCoordinates)
 	for i := 0; i < totalPoint; i++ {
@@ -63,17 +63,17 @@ func (self *KMeansCluster) Recenter() float64 {
 			totals[j] = totals[j] + point.items.Get(j).(float64)
 		}
 	}
-	
+
 	// average out
 	averages := make([]float64, totalCoordinates)
 	for i := 0; i < totalCoordinates; i++ {
 		averages[i] = totals[i] / float64(totalPoint)
 	}
-	
+
 	// calculate the distance between old and new center
 	newCenter := NewKMeansPoint(averages)
 	distance := self.center.DistanceFromPoint(newCenter)
 	self.center = newCenter
-	
+
 	return distance
 }

@@ -1,8 +1,8 @@
 package sdl
 
 import (
-	"testing"
 	"sync"
+	"testing"
 )
 
 const (

@@ -8,18 +8,18 @@ import (
 
 func main() {
 	buttons := []sdl.MessageBoxButtonData{
-		{ 0, 0, "no" },
-		{ sdl.MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "yes" },
-		{ sdl.MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "cancel" },
+		{0, 0, "no"},
+		{sdl.MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "yes"},
+		{sdl.MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 2, "cancel"},
 	}
 
 	colorScheme := sdl.MessageBoxColorScheme{
 		Colors: [5]sdl.MessageBoxColor{
-			sdl.MessageBoxColor{ 255,   0,   0 },
-			sdl.MessageBoxColor{   0, 255,   0 },
-			sdl.MessageBoxColor{ 255, 255,   0 },
-			sdl.MessageBoxColor{   0,   0, 255 },
-			sdl.MessageBoxColor{ 255,   0, 255 },
+			sdl.MessageBoxColor{255, 0, 0},
+			sdl.MessageBoxColor{0, 255, 0},
+			sdl.MessageBoxColor{255, 255, 0},
+			sdl.MessageBoxColor{0, 0, 255},
+			sdl.MessageBoxColor{255, 0, 255},
 		},
 	}
 

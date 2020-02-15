@@ -33,36 +33,35 @@ import "bytes"
 import "fmt"
 
 type HashSet struct {
-	lock *sync.Mutex
+	lock  *sync.Mutex
 	items map[interface{}]interface{}
 }
 
-
 func NewHashSet() *HashSet {
 	instance := &HashSet{}
-	
+
 	instance.lock = &sync.Mutex{}
 	instance.items = make(map[interface{}]interface{})
-	
+
 	return instance
 }
 
 func (self *HashSet) Len() int {
 	self.lock.Lock()
 	defer self.lock.Unlock()
-	
+
 	return len(self.items)
 }
 
 func (self *HashSet) ToSlice() []interface{} {
 	self.lock.Lock()
 	defer self.lock.Unlock()
-	
+
 	var result []interface{}
 	for k, _ := range self.items {
 		result = append(result, k)
 	}
-	
+
 	return result
 }
 
@@ -73,7 +72,7 @@ func (self *HashSet) IsEmpty() bool {
 func (self *HashSet) Add(objects ...interface{}) {
 	self.lock.Lock()
 	defer self.lock.Unlock()
-	
+
 	for _, o := range objects {
 		self.items[o] = true
 	}
@@ -82,7 +81,7 @@ func (self *HashSet) Add(objects ...interface{}) {
 func (self *HashSet) Get(k interface{}) interface{} {
 	self.lock.Lock()
 	defer self.lock.Unlock()
-	
+
 	return self.items[k]
 }
 
@@ -93,7 +92,7 @@ func (self *HashSet) Contains(k interface{}) bool {
 func (self *HashSet) Remove(k interface{}) bool {
 	self.lock.Lock()
 	defer self.lock.Unlock()
-	
+
 	found := self.items[k]
 	if found != nil {
 		delete(self.items, k)
@@ -112,9 +111,9 @@ func (self *HashSet) Clear() {
 func (self *HashSet) String() string {
 	self.lock.Lock()
 	defer self.lock.Unlock()
-	
+
 	var buffer bytes.Buffer
-	
+
 	i := 0
 	for k, _ := range self.items {
 		stringify := fmt.Sprintf("%s", k)

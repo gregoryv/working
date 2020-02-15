@@ -33,11 +33,10 @@ import "github.com/hishboy/gocommons/ml/support"
 import "math"
 
 type SimpleKMeans struct {
-	points *lang.ArrayList
+	points           *lang.ArrayList
 	numberOfClusters int
-	delta float64
+	delta            float64
 }
-
 
 func NewSimpleKMeans(numberOfClusters int) *SimpleKMeans {
 	self := &SimpleKMeans{}
@@ -46,7 +45,6 @@ func NewSimpleKMeans(numberOfClusters int) *SimpleKMeans {
 	self.delta = 0.001 // default delta
 	return self
 }
-
 
 func (self *SimpleKMeans) SetDelta(delta float64) {
 	self.delta = delta
@@ -61,10 +59,10 @@ func (self *SimpleKMeans) AddPointAsSlice(items []float64) {
 }
 
 func (self *SimpleKMeans) Cluster() *lang.ArrayList {
-	if (self.numberOfClusters == 1) {
+	if self.numberOfClusters == 1 {
 		panic("please specify more than one cluster")
 	}
-	
+
 	clusters := lang.NewArrayList()
 	uniqueCenters := lang.NewHashSet()
 	for i := 0; i < self.numberOfClusters; i++ {
@@ -76,40 +74,40 @@ func (self *SimpleKMeans) Cluster() *lang.ArrayList {
 		cluster := support.NewKMeansCluster(randomCenter)
 		clusters.Add(cluster)
 	}
-	
+
 	for {
-		
+
 		// find nearest cluster and assign point to cluster
 		for i := 0; i < self.points.Len(); i++ {
 			smallestDistance := math.MaxFloat64
 			var nearestCluster *support.KMeansCluster
-			
+
 			point := self.points.Get(i).(*support.KMeansPoint)
 			for j := 0; j < clusters.Len(); j++ {
 				cluster := clusters.Get(j).(*support.KMeansCluster)
 				distanceBetweenCenterAndPoint := point.DistanceFromPoint(cluster.Center())
-				if  distanceBetweenCenterAndPoint < smallestDistance {
+				if distanceBetweenCenterAndPoint < smallestDistance {
 					smallestDistance = distanceBetweenCenterAndPoint
 					nearestCluster = cluster
 				}
 			}
 			nearestCluster.Points().Add(point)
 		}
-		
+
 		// recalculate new center in cluster and check if delta was satisfied
 		biggestDeltaDistance := -math.MaxFloat64
 		newDeltaDistance := self.delta
 		for i := 0; i < clusters.Len(); i++ {
-			cluster := clusters.Get(i).(*support.KMeansCluster)						
+			cluster := clusters.Get(i).(*support.KMeansCluster)
 			newDeltaDistance = cluster.Recenter()
 			if newDeltaDistance > biggestDeltaDistance {
 				biggestDeltaDistance = newDeltaDistance
 			}
 		}
-		
+
 		// quit if delta was satisfied
 		if newDeltaDistance < self.delta {
-			break;
+			break
 		} else {
 			// otherwise clear cluster and try again
 			for i := 0; i < clusters.Len(); i++ {
@@ -117,8 +115,8 @@ func (self *SimpleKMeans) Cluster() *lang.ArrayList {
 				cluster.Points().Clear()
 			}
 		}
-		
+
 	}
-	
+
 	return clusters
 }

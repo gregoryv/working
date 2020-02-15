@@ -30,7 +30,7 @@ func TestAudioDevices(t *testing.T) {
 }
 
 func TestAudioInitQuit(t *testing.T) {
-	Do(func(){
+	Do(func() {
 		// figure out what driver will work
 		if err := InitSubSystem(INIT_AUDIO); err != nil {
 			t.Fatalf("InitSubSystem(INIT_AUDIO): %v", err)

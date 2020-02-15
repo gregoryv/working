@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	WindowTitle = "Go-SDL2 Render Queue"
-	WindowWidth = 800
+	WindowTitle  = "Go-SDL2 Render Queue"
+	WindowWidth  = 800
 	WindowHeight = 600
 )
 

@@ -96,7 +96,7 @@ const (
 type HintCallback func(data interface{}, name, oldValue, newValue string)
 type HintCallbackAndData struct {
 	callback HintCallback
-	data interface{}
+	data     interface{}
 }
 
 var hintCallbacks = make(map[string]HintCallbackAndData)
@@ -143,7 +143,7 @@ func AddHintCallback(name string, fn HintCallback, data interface{}) {
 	_name := C.CString(name)
 	hintCallbacks[name] = HintCallbackAndData{
 		callback: fn,
-		data: data,
+		data:     data,
 	}
 	C.addHintCallback(_name)
 }

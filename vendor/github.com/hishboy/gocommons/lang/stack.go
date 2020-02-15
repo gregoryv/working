@@ -29,9 +29,9 @@
 package lang
 
 import (
-	"sync"
 	"errors"
 	"fmt"
+	"sync"
 )
 
 type stacknode struct {
@@ -39,11 +39,10 @@ type stacknode struct {
 	next *stacknode
 }
 
-
 type Stack struct {
-	head *stacknode
+	head  *stacknode
 	count int
-	lock *sync.Mutex
+	lock  *sync.Mutex
 }
 
 func NewStack() *Stack {
@@ -62,7 +61,7 @@ func (s *Stack) Get(index int) (interface{}, error) {
 	defer s.lock.Unlock()
 
 	n := s.head
-	for i := 1 ; i < s.count - index ; i++ {
+	for i := 1; i < s.count-index; i++ {
 		n = n.next
 	}
 
@@ -73,7 +72,7 @@ func (s *Stack) Get(index int) (interface{}, error) {
 func (s *Stack) Dump() {
 	n := s.head
 	fmt.Print("[ ")
-  for i := 0 ; i < s.count ; i++ {
+	for i := 0; i < s.count; i++ {
 		fmt.Printf("%+v ", n.data)
 		n = n.next
 	}
@@ -91,7 +90,7 @@ func (s *Stack) Push(item interface{}) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	n := &stacknode { data: item }
+	n := &stacknode{data: item}
 
 	if s.head == nil {
 		s.head = n

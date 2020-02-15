@@ -10,14 +10,14 @@ import (
 )
 
 const (
-	WindowTitle = "Go-SDL2 Render"
-	WindowWidth = 800
+	WindowTitle  = "Go-SDL2 Render"
+	WindowWidth  = 800
 	WindowHeight = 600
-	FrameRate = 60
+	FrameRate    = 60
 
-	RectWidth = 20
+	RectWidth  = 20
 	RectHeight = 20
-	NumRects = WindowHeight / RectHeight
+	NumRects   = WindowHeight / RectHeight
 )
 
 var rects [NumRects]sdl.Rect
