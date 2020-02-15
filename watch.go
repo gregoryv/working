@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (wd WorkDir) Watch(ctx context.Context, w *Sensor, fn ModifiedFunc) {
+func (wd WorkDir) Watch(ctx context.Context, w *Sensor) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -16,32 +16,38 @@ func (wd WorkDir) Watch(ctx context.Context, w *Sensor, fn ModifiedFunc) {
 		default:
 			w.scanForChanges(string(wd))
 			if len(w.modified) > 0 {
-				fn(wd, w.modified...)
+				w.React(wd, w.modified...)
 				// Reset modified files, should not leak memory as
 				// it's only strings
 				w.modified = w.modified[:0:0]
 				w.Last = time.Now()
 			}
-			time.Sleep(1000 * time.Millisecond)
+			time.Sleep(w.Pause)
 		}
 	}
 }
 
 type ModifiedFunc func(wd WorkDir, modified ...string)
 
+// NewSensor returns a sensor with 1s delay and no reaction func.
+// Set React.
 func NewSensor() *Sensor {
 	return &Sensor{
+		Pause:    time.Second,
 		Last:     time.Now(),
 		modified: make([]string, 0),
 		ignore:   []string{"#", ".git/", "vendor/"},
+		React:    func(WorkDir, ...string) {}, // nop
 	}
 }
 
 type Sensor struct {
 	Recursive bool
+	Pause     time.Duration // between scans
 	Last      time.Time
 	modified  []string
 	ignore    []string
+	React     ModifiedFunc
 }
 
 func (s *Sensor) scanForChanges(root string) {
