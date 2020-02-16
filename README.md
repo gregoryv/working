@@ -2,7 +2,7 @@
 [![codecov](https://codecov.io/gh/gregoryv/working/branch/master/graph/badge.svg)](https://codecov.io/gh/gregoryv/working)
 
 
-[workdir](https://godoc.org/github.com/gregoryv/working) - Package defines Directory type for easy file operations
+[working](https://godoc.org/github.com/gregoryv/working) - Package defines Directory type for easy file operations
 
 This package is most useful if you need to do multiple file operations
 within one directory. Eg. something like
@@ -16,9 +16,9 @@ within one directory. Eg. something like
 
 Using this package you would
 
-    wd := new(working.Directory)
-	wd.SetPath("/tmp/dir")
-	wd.MkdirAll("child1", "child2")
-	wd.TouchAll("child1/A", "child2/B")
+    d := new(working.Directory)
+	d.SetPath("/tmp/dir")
+	d.MkdirAll("child1", "child2")
+	d.TouchAll("child1/A", "child2/B")
 	// do stuff
-	wd.RemoveAll()
+	d.RemoveAll()
