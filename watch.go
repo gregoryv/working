@@ -8,15 +8,15 @@ import (
 	"time"
 )
 
-func (wd *Directory) Watch(ctx context.Context, w *Sensor) {
+func (d *Directory) Watch(ctx context.Context, w *Sensor) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
-			w.scanForChanges(wd.Path())
+			w.scanForChanges(d.Path())
 			if len(w.modified) > 0 {
-				w.React(wd, w.modified...)
+				w.React(d, w.modified...)
 				// Reset modified files, should not leak memory as
 				// it's only strings
 				w.modified = w.modified[:0:0]
@@ -27,7 +27,7 @@ func (wd *Directory) Watch(ctx context.Context, w *Sensor) {
 	}
 }
 
-type ModifiedFunc func(wd *Directory, modified ...string)
+type ModifiedFunc func(d *Directory, modified ...string)
 
 // NewSensor returns a sensor with 1s delay and no reaction func.
 // Set React.

@@ -13,16 +13,16 @@ type Directory struct {
 	path string
 }
 
-func (wd *Directory) SetPath(path string) { wd.path = path }
+func (d *Directory) SetPath(path string) { d.path = path }
 
-func (wd *Directory) Chmod(filename string, mode os.FileMode) error {
-	return os.Chmod(wd.Join(filename), mode)
+func (d *Directory) Chmod(filename string, mode os.FileMode) error {
+	return os.Chmod(d.Join(filename), mode)
 }
 
 // IsEmpty returns true if the dir is empty, false otherwise.
 // Use empty string to check the workdir itself.
-func (wd *Directory) IsEmpty(dir string) bool {
-	name := wd.Join(dir)
+func (d *Directory) IsEmpty(dir string) bool {
+	name := d.Join(dir)
 	f, err := os.Open(name)
 	if err != nil {
 		return false
@@ -37,11 +37,11 @@ func (wd *Directory) IsEmpty(dir string) bool {
 }
 
 // List content using the given writer. If w is nil stdout is used.
-func (wd *Directory) Ls(w io.Writer) error {
+func (d *Directory) Ls(w io.Writer) error {
 	if w == nil {
 		w = os.Stdout
 	}
-	path := wd.Path()
+	path := d.Path()
 	return filepath.Walk(path, showVisible(w, path))
 }
 
@@ -84,24 +84,23 @@ func visible(f os.FileInfo) bool {
 }
 
 // Returns a new temporary working directory.
-func TempDir() (*Directory, error) {
+func (d *Directory) Temporary() error {
 	tmp, err := ioutil.TempDir("", "workdir")
 	if err != nil {
-		return nil, err
+		return err
 	}
-	dir := new(Directory)
-	dir.SetPath(tmp)
-	return dir, nil
+	d.SetPath(tmp)
+	return nil
 }
 
 // WriteFile creates/writes over the file with mode 0644
-func (wd *Directory) WriteFile(file string, data []byte) error {
-	return ioutil.WriteFile(wd.Join(file), data, 0644)
+func (d *Directory) WriteFile(file string, data []byte) error {
+	return ioutil.WriteFile(d.Join(file), data, 0644)
 }
 
 // ReadAll loads the given file like ioutil.ReadAll
-func (wd *Directory) Load(file string) ([]byte, error) {
-	fh, err := os.Open(wd.Join(file))
+func (d *Directory) Load(file string) ([]byte, error) {
+	fh, err := os.Open(d.Join(file))
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +108,9 @@ func (wd *Directory) Load(file string) ([]byte, error) {
 	return ioutil.ReadAll(fh)
 }
 
-func (wd *Directory) MkdirAll(subDirs ...string) error {
+func (d *Directory) MkdirAll(subDirs ...string) error {
 	for _, sub := range subDirs {
-		err := os.MkdirAll(filepath.Join(wd.Path(), sub), 0755)
+		err := os.MkdirAll(filepath.Join(d.Path(), sub), 0755)
 		if err != nil {
 			return err
 		}
@@ -119,22 +118,22 @@ func (wd *Directory) MkdirAll(subDirs ...string) error {
 	return nil
 }
 
-func (wd *Directory) String() string {
-	return wd.Path()
+func (d *Directory) String() string {
+	return d.Path()
 }
 
-func (wd *Directory) Path() string {
-	if wd.path == "" {
+func (d *Directory) Path() string {
+	if d.path == "" {
 		d, _ := os.Getwd()
 		return d
 	}
-	return wd.path
+	return d.path
 }
 
-func (wd *Directory) TouchAll(filenames ...string) ([]string, error) {
+func (d *Directory) TouchAll(filenames ...string) ([]string, error) {
 	files := make([]string, len(filenames))
 	for i, name := range filenames {
-		name, err := wd.Touch(name)
+		name, err := d.Touch(name)
 		if err != nil {
 			return files, err
 		}
@@ -143,35 +142,35 @@ func (wd *Directory) TouchAll(filenames ...string) ([]string, error) {
 	return files, nil
 }
 
-func (wd *Directory) Touch(filename string) (string, error) {
-	fh, err := os.Create(wd.Join(filename))
+func (d *Directory) Touch(filename string) (string, error) {
+	fh, err := os.Create(d.Join(filename))
 	if err != nil {
 		return filename, err
 	}
 	return filename, fh.Close()
 }
 
-func (wd *Directory) Join(filename string) string {
-	return filepath.Join(wd.Path(), filename)
+func (d *Directory) Join(filename string) string {
+	return filepath.Join(d.Path(), filename)
 }
 
-func (wd *Directory) RemoveAll() error {
-	if wd.Path() == "/" {
+func (d *Directory) RemoveAll() error {
+	if d.Path() == "/" {
 		return fmt.Errorf("Cannot remove root directory")
 	}
-	return os.RemoveAll(wd.Path())
+	return os.RemoveAll(d.Path())
 }
 
 // Copy the src file to dest. Both src and dest are considered to be
 // inside the working dir.
-func (wd *Directory) Copy(dest, src string) (err error) {
-	in, err := os.Open(wd.Join(src))
+func (d *Directory) Copy(dest, src string) (err error) {
+	in, err := os.Open(d.Join(src))
 	if err != nil {
 		return
 	}
 	defer in.Close()
 
-	out, err := os.Create(wd.Join(dest))
+	out, err := os.Create(d.Join(dest))
 	if err != nil {
 		return
 	}

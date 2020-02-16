@@ -9,56 +9,59 @@ import (
 )
 
 func TestChmod(t *testing.T) {
-	wd, _ := TempDir()
+	d := new(Directory)
+	d.Temporary()
 	f := "file"
-	wd.Touch(f)
-	err := wd.Chmod(f, 0400) // read only
+	d.Touch(f)
+	err := d.Chmod(f, 0400) // read only
 	if err != nil {
-		t.Error(wd, err)
+		t.Error(d, err)
 	}
-	wd.RemoveAll()
+	d.RemoveAll()
 }
 
 func TestLoad(t *testing.T) {
-	wd, _ := TempDir()
-	_, err := wd.Load("nosuchfile")
+	d := new(Directory)
+	d.Temporary()
+	_, err := d.Load("nosuchfile")
 	if err == nil {
 		t.Error("should fail when loading nonexisting file")
 	}
 
 	exp := "hello"
-	wd.WriteFile("x", []byte(exp))
-	body, err := wd.Load("x")
+	d.WriteFile("x", []byte(exp))
+	body, err := d.Load("x")
 	if err != nil {
 		t.Error(err)
 	}
 	got := string(body)
 	assert := asserter.New(t)
 	assert().Equals(got, exp)
-	wd.RemoveAll()
+	d.RemoveAll()
 }
 
 func TestIsEmpty(t *testing.T) {
-	tmp, _ := TempDir()
-	if !tmp.IsEmpty("") {
+	d := new(Directory)
+	d.Temporary()
+	if !d.IsEmpty("") {
 		t.Error("Expected new temporary directory to be empty")
 	}
-	tmp.TouchAll("k")
-	if tmp.IsEmpty("") {
+	d.TouchAll("k")
+	if d.IsEmpty("") {
 		t.Error("Dir with contents should not be empty")
 	}
 
-	tmp.RemoveAll()
-	if tmp.IsEmpty("") {
+	d.RemoveAll()
+	if d.IsEmpty("") {
 		t.Error("IsEmpty should be false for non existing")
 	}
 
 }
 
 func TestRemoveAll(t *testing.T) {
-	wd := new(Directory)
-	wd.SetPath("/")
-	err := wd.RemoveAll() // :-)
+	d := new(Directory)
+	d.SetPath("/")
+	err := d.RemoveAll() // :-)
 	if err == nil {
 		t.Fatal("Well we've probably erased the entire disk")
 	}
@@ -67,27 +70,31 @@ func TestRemoveAll(t *testing.T) {
 func TestTempDir_error(t *testing.T) {
 	os.Setenv("TMPDIR", "/_no_such_dir")
 	defer os.Setenv("TMPDIR", "/tmp")
-	_, err := TempDir()
+	d := new(Directory)
+	err := d.Temporary()
 	if err == nil {
 		t.Fail()
 	}
 }
 
 func Test_Ls_error(t *testing.T) {
-	wd, _ := TempDir()
-	wd.RemoveAll()
-	err := wd.Ls(nil)
+	d := new(Directory)
+	d.Temporary()
+	d.RemoveAll()
+	err := d.Ls(nil)
 	if err == nil {
 		t.Fail()
 	}
 }
 
 func Test_Ls(t *testing.T) {
-	wd, _ := setup()
-	defer wd.RemoveAll()
+	d := new(Directory)
+	d.Temporary()
+	setup(d)
+	defer d.RemoveAll()
 
 	w := bytes.NewBufferString("")
-	wd.Ls(w)
+	d.Ls(w)
 	got := w.String()
 	exp := `A
 B
@@ -101,23 +108,17 @@ sub/
 	}
 }
 
-func setup() (wd *Directory, err error) {
-	wd, err = TempDir()
+func setup(d *Directory) {
+	os.Chdir(d.Path())
+	d.MkdirAll("sub/lev", "empty", "ex", "newdir")
+	_, err := d.TouchAll("A", "B", "sub/lev/C", ".hidden", "ex/D")
 	if err != nil {
-		return
+		panic(err)
 	}
-	os.Chdir(wd.Path())
-	wd.MkdirAll("sub/lev", "empty", "ex", "newdir")
-	_, err = wd.TouchAll("A", "B", "sub/lev/C", ".hidden", "ex/D")
-	if err != nil {
-		return
-	}
-
-	wd.WriteFile("A", []byte("hello"))
-	wd.WriteFile("sub/lev/C", []byte("hello"))
-	wd.WriteFile("sub/lev/C", []byte("world"))
-	wd.TouchAll("ex/e1", "ex/e2", "newdir/file.txt")
-	return
+	d.WriteFile("A", []byte("hello"))
+	d.WriteFile("sub/lev/C", []byte("hello"))
+	d.WriteFile("sub/lev/C", []byte("world"))
+	d.TouchAll("ex/e1", "ex/e2", "newdir/file.txt")
 }
 
 func Test_String(t *testing.T) {
@@ -129,48 +130,51 @@ func Test_String(t *testing.T) {
 }
 
 func TestTouch(t *testing.T) {
-	wd, _ := TempDir()
-	defer wd.RemoveAll()
-	wd.MkdirAll("x")
-	os.Chmod(wd.Join("x"), 0000)
-	_, err := wd.TouchAll("x")
+	d := new(Directory)
+	d.Temporary()
+	defer d.RemoveAll()
+	d.MkdirAll("x")
+	os.Chmod(d.Join("x"), 0000)
+	_, err := d.TouchAll("x")
 	if err == nil {
 		t.Error("Expected to fail")
 	}
 	// Cleanup
-	os.Chmod(wd.Join("x"), 0644)
+	os.Chmod(d.Join("x"), 0644)
 }
 
 func TestMkdirAll(t *testing.T) {
-	wd, _ := TempDir()
-	defer wd.RemoveAll()
-	os.Chmod(wd.Path(), 0000)
-	err := wd.MkdirAll("hepp")
+	d := new(Directory)
+	d.Temporary()
+	defer d.RemoveAll()
+	os.Chmod(d.Path(), 0000)
+	err := d.MkdirAll("hepp")
 	if err == nil {
 		t.Error("Expected to fail")
 	}
-	os.Chmod(wd.Join("x"), 0644)
+	os.Chmod(d.Join("x"), 0644)
 }
 
 func TestCopy_errors(t *testing.T) {
-	wd, _ := TempDir()
-	defer wd.RemoveAll()
-	err := wd.Copy("dest", "nosuchfile")
+	d := new(Directory)
+	d.Temporary()
+	defer d.RemoveAll()
+	err := d.Copy("dest", "nosuchfile")
 	if err == nil {
 		t.Error("Should fail to copy when src doesn't exist")
 	}
 	a := "a.file"
 	b := "b.file"
 	body := []byte("content")
-	wd.WriteFile(a, body)
-	wd.WriteFile(b, body)
-	err = os.Chmod(wd.Join(a), 0000)
+	d.WriteFile(a, body)
+	d.WriteFile(b, body)
+	err = os.Chmod(d.Join(a), 0000)
 	if err != nil {
 		t.Error(err)
 	}
-	err = wd.Copy(a, b)
+	err = d.Copy(a, b)
 	if err == nil {
 		t.Error("Should fail if cannot write destination")
 	}
-	os.Chmod(wd.Join(a), 0644)
+	os.Chmod(d.Join(a), 0644)
 }

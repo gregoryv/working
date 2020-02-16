@@ -1,11 +1,12 @@
 package working
 
 func ExampleTempDir() {
-	wd, _ := TempDir()
-	wd.WriteFile("hello.txt", []byte("Hello, working directory!"))
-	wd.TouchAll("a.md", "b.sh")
-	wd.Ls(nil)
-	wd.RemoveAll()
+	d := new(Directory)
+	d.Temporary()
+	d.WriteFile("hello.txt", []byte("Hello, working directory!"))
+	d.TouchAll("a.md", "b.sh")
+	d.Ls(nil)
+	d.RemoveAll()
 	// output:
 	// a.md
 	// b.sh
@@ -14,11 +15,12 @@ func ExampleTempDir() {
 }
 
 func ExampleWorkDir_Copy() {
-	wd, _ := TempDir()
-	defer wd.RemoveAll()
-	wd.WriteFile("src", []byte("hello"))
-	wd.Copy("dest", "src")
-	wd.Ls(nil)
+	d := new(Directory)
+	d.Temporary()
+	defer d.RemoveAll()
+	d.WriteFile("src", []byte("hello"))
+	d.Copy("dest", "src")
+	d.Ls(nil)
 	// output:
 	// dest
 	// src

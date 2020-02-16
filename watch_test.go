@@ -8,9 +8,10 @@ import (
 )
 
 func TestWatch(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	wd, _ := TempDir()
-	wd.MkdirAll("sub", "vendor/a/b")
+	d := new(Directory)
+	d.Temporary()
+	defer d.RemoveAll()
+	d.MkdirAll("sub", "vendor/a/b")
 	var (
 		called bool
 		sens   = NewSensor()
@@ -18,7 +19,9 @@ func TestWatch(t *testing.T) {
 	sens.React = func(*Directory, ...string) { called = true }
 	sens.Pause = 50 * time.Millisecond
 	plus := sens.Pause + 10*time.Millisecond
-	go wd.Watch(ctx, sens)
+	ctx, cancel := context.WithCancel(context.Background())
+	go d.Watch(ctx, sens)
+	defer cancel()
 	time.Sleep(plus)
 
 	shouldSense := func(s string, err error) {
@@ -29,7 +32,7 @@ func TestWatch(t *testing.T) {
 			t.Error(s)
 		}
 	}
-	shouldSense(wd.Touch("a"))
+	shouldSense(d.Touch("a"))
 
 	shouldNotSense := func(s string, err error) {
 		t.Helper()
@@ -40,22 +43,19 @@ func TestWatch(t *testing.T) {
 		}
 	}
 	// Not recursive
-	shouldNotSense(wd.Touch("sub/hello"))
+	shouldNotSense(d.Touch("sub/hello"))
 
 	// vendor should be ignored by default
-	shouldNotSense(wd.Touch("vendor/noop"))
+	shouldNotSense(d.Touch("vendor/noop"))
 
 	// Directories are ignored by default
-	shouldNotSense(wd.Touch("vendor"))
+	shouldNotSense(d.Touch("vendor"))
 
 	// Removed
 	sens.Recursive = true
-	wd.MkdirAll("sub")
-	wd.Touch("sub/x")
-	os.RemoveAll(wd.Join("sub"))
+	d.MkdirAll("sub")
+	d.Touch("sub/x")
+	os.RemoveAll(d.Join("sub"))
 	time.Sleep(plus)
 	shouldNotSense("", nil)
-
-	cancel()
-	wd.RemoveAll()
 }
