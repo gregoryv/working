@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func setup() (wd WorkDir, err error) {
+func setup() (wd Directory, err error) {
 	wd, err = TempDir()
 	if err != nil {
 		return

@@ -15,7 +15,7 @@ func TestWatch(t *testing.T) {
 		called bool
 		sens   = NewSensor()
 	)
-	sens.React = func(WorkDir, ...string) { called = true }
+	sens.React = func(Directory, ...string) { called = true }
 	sens.Pause = 50 * time.Millisecond
 	plus := sens.Pause + 10*time.Millisecond
 	go wd.Watch(ctx, sens)

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (wd WorkDir) Watch(ctx context.Context, w *Sensor) {
+func (wd Directory) Watch(ctx context.Context, w *Sensor) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -27,7 +27,7 @@ func (wd WorkDir) Watch(ctx context.Context, w *Sensor) {
 	}
 }
 
-type ModifiedFunc func(wd WorkDir, modified ...string)
+type ModifiedFunc func(wd Directory, modified ...string)
 
 // NewSensor returns a sensor with 1s delay and no reaction func.
 // Set React.
@@ -37,7 +37,7 @@ func NewSensor() *Sensor {
 		Last:     time.Now(),
 		modified: make([]string, 0),
 		ignore:   []string{"#", ".git/", "vendor/"},
-		React:    func(WorkDir, ...string) {}, // nop
+		React:    func(Directory, ...string) {}, // nop
 	}
 }
 

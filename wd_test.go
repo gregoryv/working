@@ -56,7 +56,7 @@ func TestIsEmpty(t *testing.T) {
 }
 
 func TestRemoveAll(t *testing.T) {
-	err := WorkDir("/").RemoveAll() // :-)
+	err := Directory("/").RemoveAll() // :-)
 	if err == nil {
 		t.Fatal("Well we've probably erased the entire disk")
 	}
@@ -107,7 +107,7 @@ func TestNew(t *testing.T) {
 }
 
 func Test_String(t *testing.T) {
-	got := WorkDir(".").String()
+	got := Directory(".").String()
 	exp := "."
 	if exp != got {
 		t.Errorf("Expected %q, got %q", exp, got)
