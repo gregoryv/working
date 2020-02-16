@@ -7,6 +7,35 @@ import (
 	"time"
 )
 
+func TestWatch_long(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+	d := new(Directory)
+	d.Temporary()
+	defer d.RemoveAll()
+
+	var (
+		calls int
+		sens  = NewSensor()
+	)
+	sens.Pause = 50 * time.Millisecond
+	plus := sens.Pause + 10*time.Millisecond
+
+	sens.React = func(*Directory, ...string) { calls++ }
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go d.Watch(ctx, sens)
+	time.Sleep(plus)
+	d.Touch("x")
+	time.Sleep(plus)
+	d.Touch("x")
+	time.Sleep(5 * plus)
+	if calls != 2 {
+		t.Errorf("File changed twice but sensor reacted %v times", calls)
+	}
+}
+
 func TestWatch(t *testing.T) {
 	d := new(Directory)
 	d.Temporary()
