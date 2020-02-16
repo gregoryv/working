@@ -9,12 +9,6 @@ import (
 	"strings"
 )
 
-func New(path string) *Directory {
-	wd := new(Directory)
-	wd.path = path
-	return wd
-}
-
 type Directory struct {
 	path string
 }
