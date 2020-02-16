@@ -57,7 +57,7 @@ func TestIsEmpty(t *testing.T) {
 
 func TestRemoveAll(t *testing.T) {
 	wd := new(Directory)
-	wd.path = "/"
+	wd.SetPath("/")
 	err := wd.RemoveAll() // :-)
 	if err == nil {
 		t.Fatal("Well we've probably erased the entire disk")

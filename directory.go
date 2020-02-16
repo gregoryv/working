@@ -13,6 +13,8 @@ type Directory struct {
 	path string
 }
 
+func (wd *Directory) SetPath(path string) { wd.path = path }
+
 func (wd *Directory) Chmod(filename string, mode os.FileMode) error {
 	return os.Chmod(wd.Join(filename), mode)
 }
@@ -83,12 +85,12 @@ func visible(f os.FileInfo) bool {
 
 // Returns a new temporary working directory.
 func TempDir() (*Directory, error) {
-	tmpPath, err := ioutil.TempDir("", "workdir")
-	dir := new(Directory)
+	tmp, err := ioutil.TempDir("", "workdir")
 	if err != nil {
-		return dir, err
+		return nil, err
 	}
-	dir.path = tmpPath
+	dir := new(Directory)
+	dir.SetPath(tmp)
 	return dir, nil
 }
 
