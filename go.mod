@@ -1,4 +1,4 @@
-module github.com/gregoryv/workdir
+module github.com/gregoryv/working
 
 require (
 	github.com/gregoryv/asserter v0.1.0

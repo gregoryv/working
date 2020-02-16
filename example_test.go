@@ -1,4 +1,4 @@
-package workdir
+package working
 
 func ExampleTempDir() {
 	wd, _ := TempDir()

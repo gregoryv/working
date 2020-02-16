@@ -1,4 +1,4 @@
-package workdir
+package working
 
 import (
 	"os"
