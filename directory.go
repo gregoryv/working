@@ -5,7 +5,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -100,12 +99,12 @@ func TempDir() (*Directory, error) {
 }
 
 // WriteFile creates/writes over the file with mode 0644
-func (wd Directory) WriteFile(file string, data []byte) error {
+func (wd *Directory) WriteFile(file string, data []byte) error {
 	return ioutil.WriteFile(wd.Join(file), data, 0644)
 }
 
 // ReadAll loads the given file like ioutil.ReadAll
-func (wd Directory) Load(file string) ([]byte, error) {
+func (wd *Directory) Load(file string) ([]byte, error) {
 	fh, err := os.Open(wd.Join(file))
 	if err != nil {
 		return nil, err
@@ -114,18 +113,14 @@ func (wd Directory) Load(file string) ([]byte, error) {
 	return ioutil.ReadAll(fh)
 }
 
-func (wd Directory) MkdirAll(subDirs ...string) error {
+func (wd *Directory) MkdirAll(subDirs ...string) error {
 	for _, sub := range subDirs {
-		err := os.MkdirAll(filepath.Join(wd.String(), sub), 0755)
+		err := os.MkdirAll(filepath.Join(wd.Path(), sub), 0755)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func (wd Directory) Command(cmd string, args ...string) *exec.Cmd {
-	return exec.Command(cmd, args...)
 }
 
 func (wd *Directory) String() string {
@@ -140,7 +135,7 @@ func (wd *Directory) Path() string {
 	return wd.path
 }
 
-func (wd Directory) TouchAll(filenames ...string) ([]string, error) {
+func (wd *Directory) TouchAll(filenames ...string) ([]string, error) {
 	files := make([]string, len(filenames))
 	for i, name := range filenames {
 		name, err := wd.Touch(name)
