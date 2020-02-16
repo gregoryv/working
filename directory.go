@@ -6,24 +6,27 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"strings"
 )
 
-func New(path string) Directory {
-	return Directory(path)
+func New(path string) *Directory {
+	wd := new(Directory)
+	wd.path = path
+	return wd
 }
 
-type Directory string
+type Directory struct {
+	path string
+}
 
-func (wd Directory) Chmod(filename string, mode os.FileMode) error {
+func (wd *Directory) Chmod(filename string, mode os.FileMode) error {
 	return os.Chmod(wd.Join(filename), mode)
 }
 
 // IsEmpty returns true if the dir is empty, false otherwise.
 // Use empty string to check the workdir itself.
-func (wd Directory) IsEmpty(dir string) bool {
+func (wd *Directory) IsEmpty(dir string) bool {
 	name := wd.Join(dir)
 	f, err := os.Open(name)
 	if err != nil {
@@ -39,11 +42,12 @@ func (wd Directory) IsEmpty(dir string) bool {
 }
 
 // List content using the given writer. If w is nil stdout is used.
-func (wd Directory) Ls(w io.Writer) error {
+func (wd *Directory) Ls(w io.Writer) error {
 	if w == nil {
 		w = os.Stdout
 	}
-	return filepath.Walk(wd.String(), showVisible(w, string(wd)))
+	path := wd.Path()
+	return filepath.Walk(path, showVisible(w, path))
 }
 
 func showVisible(w io.Writer, root string) filepath.WalkFunc {
@@ -85,12 +89,14 @@ func visible(f os.FileInfo) bool {
 }
 
 // Returns a new temporary working directory.
-func TempDir() (Directory, error) {
+func TempDir() (*Directory, error) {
 	tmpPath, err := ioutil.TempDir("", "workdir")
+	dir := new(Directory)
 	if err != nil {
-		return Directory(""), err
+		return dir, err
 	}
-	return Directory(tmpPath), nil
+	dir.path = tmpPath
+	return dir, nil
 }
 
 // WriteFile creates/writes over the file with mode 0644
@@ -122,8 +128,16 @@ func (wd Directory) Command(cmd string, args ...string) *exec.Cmd {
 	return exec.Command(cmd, args...)
 }
 
-func (wd Directory) String() string {
-	return string(wd)
+func (wd *Directory) String() string {
+	return wd.Path()
+}
+
+func (wd *Directory) Path() string {
+	if wd.path == "" {
+		d, _ := os.Getwd()
+		return d
+	}
+	return wd.path
 }
 
 func (wd Directory) TouchAll(filenames ...string) ([]string, error) {
@@ -138,28 +152,28 @@ func (wd Directory) TouchAll(filenames ...string) ([]string, error) {
 	return files, nil
 }
 
-func (wd Directory) Touch(filename string) (string, error) {
-	fh, err := os.Create(path.Join(wd.String(), filename))
+func (wd *Directory) Touch(filename string) (string, error) {
+	fh, err := os.Create(wd.Join(filename))
 	if err != nil {
 		return filename, err
 	}
 	return filename, fh.Close()
 }
 
-func (wd Directory) Join(filename string) string {
-	return filepath.Join(wd.String(), filename)
+func (wd *Directory) Join(filename string) string {
+	return filepath.Join(wd.Path(), filename)
 }
 
-func (wd Directory) RemoveAll() error {
-	if string(wd) == "/" {
+func (wd *Directory) RemoveAll() error {
+	if wd.Path() == "/" {
 		return fmt.Errorf("Cannot remove root directory")
 	}
-	return os.RemoveAll(wd.String())
+	return os.RemoveAll(wd.Path())
 }
 
 // Copy the src file to dest. Both src and dest are considered to be
 // inside the working dir.
-func (wd Directory) Copy(dest, src string) (err error) {
+func (wd *Directory) Copy(dest, src string) (err error) {
 	in, err := os.Open(wd.Join(src))
 	if err != nil {
 		return

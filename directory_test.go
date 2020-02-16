@@ -56,7 +56,9 @@ func TestIsEmpty(t *testing.T) {
 }
 
 func TestRemoveAll(t *testing.T) {
-	err := Directory("/").RemoveAll() // :-)
+	wd := new(Directory)
+	wd.path = "/"
+	err := wd.RemoveAll() // :-)
 	if err == nil {
 		t.Fatal("Well we've probably erased the entire disk")
 	}
@@ -99,16 +101,9 @@ sub/
 	}
 }
 
-func TestNew(t *testing.T) {
-	got := New(".")
-	if got != "." {
-		t.Fail()
-	}
-}
-
 func Test_String(t *testing.T) {
-	got := Directory(".").String()
-	exp := "."
+	got := new(Directory).Path()
+	exp, _ := os.Getwd()
 	if exp != got {
 		t.Errorf("Expected %q, got %q", exp, got)
 	}
@@ -130,7 +125,7 @@ func TestTouch(t *testing.T) {
 func TestMkdirAll(t *testing.T) {
 	wd, _ := TempDir()
 	defer wd.RemoveAll()
-	os.Chmod(string(wd), 0000)
+	os.Chmod(wd.Path(), 0000)
 	err := wd.MkdirAll("hepp")
 	if err == nil {
 		t.Error("Expected to fail")
