@@ -13,16 +13,15 @@ func (d *Directory) Watch(ctx context.Context, w *Sensor) {
 		select {
 		case <-ctx.Done():
 			return
-		default:
+		case <-time.After(w.Pause):
 			w.scanForChanges(d.Path())
 			if len(w.modified) > 0 {
 				w.React(d, w.modified...)
 				// Reset modified files, should not leak memory as
 				// it's only strings
 				w.modified = w.modified[:0:0]
-				w.Last = time.Now()
+				w.Last = time.Now().Add(w.Pause)
 			}
-			time.Sleep(w.Pause)
 		}
 	}
 }
