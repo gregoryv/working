@@ -20,7 +20,7 @@ func (d *Directory) Watch(ctx context.Context, w *Sensor) {
 				// Reset modified files, should not leak memory as
 				// it's only strings
 				w.modified = w.modified[:0:0]
-				w.Last = time.Now().Add(w.Pause)
+				w.Last = time.Now()
 			}
 		}
 	}
@@ -48,23 +48,19 @@ type Sensor struct {
 	Last      time.Time
 	modified  []string
 	ignore    []string
+	root      string
 	React     ModifiedFunc
 }
 
 func (s *Sensor) scanForChanges(root string) {
+	s.root = root // set it so the visitor knows to enter the first dir
 	filepath.Walk(root, s.visit)
 }
 
 // Ignore returns true if the file should be ignored
 func (w *Sensor) Ignore(path string, f os.FileInfo) bool {
-	if f == nil { // if directory has been removed
-		return true
-	}
-	if f.IsDir() {
-		return true
-	}
-	for _, thing := range w.ignore {
-		if strings.Contains(path, thing) {
+	for _, str := range w.ignore {
+		if strings.Contains(path, str) {
 			return true
 		}
 	}
@@ -73,10 +69,23 @@ func (w *Sensor) Ignore(path string, f os.FileInfo) bool {
 
 func (w *Sensor) visit(path string, f os.FileInfo, err error) error {
 	if w.Ignore(path, f) {
+		if f.IsDir() {
+			if w.Recursive {
+				return nil
+			}
+			return filepath.SkipDir
+		}
 		return nil
 	}
-	if f.ModTime().After(w.Last) {
+	if !f.IsDir() && f.ModTime().After(w.Last) {
 		w.modified = append(w.modified, path)
+	}
+	if !f.IsDir() {
+		return nil
+	}
+	if w.root == path {
+		// the starting directory
+		return nil
 	}
 	if w.Recursive {
 		return nil
