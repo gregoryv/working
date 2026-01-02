@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/gregoryv/working.svg?branch=master)](https://travis-ci.org/gregoryv/working)
-[![codecov](https://codecov.io/gh/gregoryv/working/branch/master/graph/badge.svg)](https://codecov.io/gh/gregoryv/working)
-
+ARCHIVED! Moved to https://sogvin.com/working
 
 [working](https://godoc.org/github.com/gregoryv/working) - Package defines Directory type for easy file operations
 
